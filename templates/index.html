@@ -3,60 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Система подбора автомобилей</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <title>AutoVision</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        /* Верхнее меню */
+        .menu {
+            background-color: #003366;
+            color: #ffffff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .menu a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 16px;
+        }
+        .menu a:hover {
+            text-decoration: underline;
+        }
+        /* Основной блок */
+        .container {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+        }
+        /* Левая панель с фильтрами */
+        .filters {
+            width: 300px;
+            background: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .filters h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #003366;
+        }
+        .filters label {
+            font-size: 14px;
+            color: #333;
+        }
+        .filters input, .filters select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .filters button {
+            background: #0056b3;
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .filters button:hover {
+            background: #004a99;
+        }
+        /* Зона результатов */
+        .results {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .car-card {
+            background: #ffffff;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .car-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+        .car-card h4 {
+            font-size: 18px;
+            color: #003366;
+            margin: 10px 0;
+        }
+        .car-card p {
+            font-size: 14px;
+            color: #333;
+        }
+        .car-card button {
+            background: #0056b3;
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+        .car-card button:hover {
+            background: #004a99;
+        }
+    </style>
 </head>
 <body>
-    <header class="header">
-        <h1>Система подбора автомобилей</h1>
-    </header>
-    <main>
-        <section class="filters">
-            <h2>Фильтры</h2>
-            <form id="search-form">
-                <label for="budget">Бюджет:</label>
-                <input type="number" id="budget" name="budget" required>
+    <!-- Верхнее меню -->
+    <div class="menu">
+        <div class="logo">AutoVision</div>
+        <nav>
+            <a href="#">Главная</a>
+            <a href="#">Популярные модели</a>
+            <a href="#">Мои избранные</a>
+            <a href="#">Отчёты</a>
+            <a href="#">Помощь</a>
+        </nav>
+    </div>
 
-                <label for="type">Тип:</label>
-                <select id="type" name="type">
-                    <option value="sedan">Седан</option>
-                    <option value="suv">Кроссовер</option>
-                    <option value="truck">Грузовик</option>
-                </select>
+    <!-- Основной контейнер -->
+    <div class="container">
+        <!-- Левая панель фильтров -->
+        <div class="filters">
+            <h3>Фильтры</h3>
+            <label for="brand">Марка</label>
+            <input type="text" id="brand" placeholder="Введите марку">
+            
+            <label for="model">Модель</label>
+            <input type="text" id="model" placeholder="Введите модель">
+            
+            <label for="body">Тип кузова</label>
+            <select id="body">
+                <option value="">Выберите...</option>
+                <option value="sedan">Седан</option>
+                <option value="suv">Внедорожник</option>
+            </select>
 
-                <label for="year">Год:</label>
-                <input type="number" id="year" name="year" required>
+            <button>Применить</button>
+        </div>
 
-                <button type="submit">Найти</button>
-            </form>
-        </section>
-        <section class="results">
-            <h2>Результаты</h2>
-            <ul id="car-list"></ul>
-        </section>
-    </main>
-    <footer class="footer">
-        <p>&copy; 2024</p>
-    </footer>
-    <script>
-        document.getElementById("search-form").addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            const response = await fetch("/search", {
-                method: "POST",
-                body: formData
-            });
-            const cars = await response.json();
-            const carList = document.getElementById("car-list");
-            carList.innerHTML = "";
-            if (cars.error) {
-                carList.innerHTML = `<li>Ошибка: ${cars.error}</li>`;
-            } else {
-                cars.forEach(car => {
-                    carList.innerHTML += `<li>${car.model} (${car.year}) - ${car.price} руб.</li>`;
-                });
-            }
-        });
-    </script>
+        <!-- Зона результатов -->
+        <div class="results">
+            <div class="car-card">
+                <img src="car1.jpg" alt="Car">
+                <h4>Toyota Camry</h4>
+                <p>Цена: 1 500 000 ₽</p>
+                <button>Подробнее</button>
+            </div>
+            <!-- Дополнительные карточки -->
+        </div>
+    </div>
 </body>
 </html>
