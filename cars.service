@@ -1,0 +1,13 @@
+[Unit]
+Description=Car Selection System
+After=network-online.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/home/vano/backend_auto
+ExecStart=/usr/bin/python3 /home/vano/backend_auto/app.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
