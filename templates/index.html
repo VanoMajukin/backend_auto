@@ -3,89 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoVision</title>
+    <title>AutoVision - Поиск автомобилей</title>
     <style>
+        /* Общие стили */
         body {
-            margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
         }
-        /* Верхнее меню */
-        .menu {
+        .header {
             background-color: #003366;
             color: #ffffff;
-            padding: 10px 20px;
+            padding: 15px 20px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: center;
+            font-size: 24px;
         }
-        .menu a {
-            color: #ffffff;
-            text-decoration: none;
-            margin: 0 10px;
-            font-size: 16px;
-        }
-        .menu a:hover {
-            text-decoration: underline;
-        }
-        /* Основной блок */
         .container {
-            display: flex;
-            padding: 20px;
-            gap: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
         }
-        /* Левая панель с фильтрами */
-        .filters {
-            width: 300px;
+        .search-form {
             background: #ffffff;
+            padding: 20px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            padding: 15px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
-        .filters h3 {
-            font-size: 18px;
-            margin-bottom: 15px;
-            color: #003366;
-        }
-        .filters label {
+        .search-form label {
             font-size: 14px;
             color: #333;
+            margin-bottom: 5px;
+            display: block;
         }
-        .filters input, .filters select {
+        .search-form select {
             width: 100%;
+            margin-bottom: 15px;
             padding: 8px;
-            margin: 5px 0 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
         }
-        .filters button {
+        .search-form button {
+            width: 100%;
+            padding: 10px;
             background: #0056b3;
             color: #ffffff;
             border: none;
-            padding: 10px;
-            width: 100%;
-            cursor: pointer;
-            font-size: 16px;
             border-radius: 5px;
+            cursor: pointer;
         }
-        .filters button:hover {
+        .search-form button:hover {
             background: #004a99;
         }
-        /* Зона результатов */
         .results {
-            flex: 1;
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
         }
         .car-card {
             background: #ffffff;
-            width: 300px;
             border: 1px solid #ccc;
             border-radius: 5px;
             padding: 15px;
+            width: 280px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .car-card:hover {
+            transform: scale(1.02);
         }
         .car-card img {
             width: 100%;
@@ -93,74 +80,159 @@
             object-fit: cover;
             margin-bottom: 10px;
         }
-        .car-card h4 {
-            font-size: 18px;
+        .car-card h3 {
+            font-size: 16px;
             color: #003366;
-            margin: 10px 0;
+            margin-bottom: 10px;
         }
-        .car-card p {
-            font-size: 14px;
-            color: #333;
-        }
-        .car-card button {
-            background: #0056b3;
-            color: #ffffff;
-            border: none;
-            padding: 10px;
-            width: 100%;
-            cursor: pointer;
-            font-size: 14px;
+        .car-details {
+            background: #ffffff;
+            padding: 20px;
+            border: 1px solid #ccc;
             border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        .car-card button:hover {
-            background: #004a99;
+        .car-details img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        .car-details h2 {
+            font-size: 24px;
+            color: #003366;
+            margin-bottom: 20px;
+        }
+        .car-details p {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-    <!-- Верхнее меню -->
-    <div class="menu">
-        <div class="logo">AutoVision</div>
-        <nav>
-            <a href="#">Главная</a>
-            <a href="#">Популярные модели</a>
-            <a href="#">Мои избранные</a>
-            <a href="#">Отчёты</a>
-            <a href="#">Помощь</a>
-        </nav>
-    </div>
+    <!-- Верхняя панель -->
+    <div class="header">AutoVision</div>
 
     <!-- Основной контейнер -->
-    <div class="container">
-        <!-- Левая панель фильтров -->
-        <div class="filters">
-            <h3>Фильтры</h3>
+    <div class="container" id="main-container">
+        <!-- Форма поиска -->
+        <div class="search-form" id="search-form">
+            <h2>Найти автомобиль</h2>
             <label for="brand">Марка</label>
-            <input type="text" id="brand" placeholder="Введите марку">
-            
-            <label for="model">Модель</label>
-            <input type="text" id="model" placeholder="Введите модель">
-            
-            <label for="body">Тип кузова</label>
-            <select id="body">
-                <option value="">Выберите...</option>
-                <option value="sedan">Седан</option>
-                <option value="suv">Внедорожник</option>
+            <select id="brand" onchange="populateModels()">
+                <option value="">Выберите марку</option>
+                <option value="Toyota">Toyota</option>
+                <option value="BMW">BMW</option>
+                <option value="Mercedes">Mercedes</option>
+                <option value="Audi">Audi</option>
+                <option value="Hyundai">Hyundai</option>
             </select>
 
-            <button>Применить</button>
+            <label for="model">Модель</label>
+            <select id="model">
+                <option value="">Выберите модель</option>
+            </select>
+
+            <button onclick="searchCars()">Поиск</button>
         </div>
 
-        <!-- Зона результатов -->
-        <div class="results">
-            <div class="car-card">
-                <img src="car1.jpg" alt="Car">
-                <h4>Toyota Camry</h4>
-                <p>Цена: 1 500 000 ₽</p>
-                <button>Подробнее</button>
-            </div>
-            <!-- Дополнительные карточки -->
+        <!-- Результаты поиска -->
+        <div class="results" id="results"></div>
+    </div>
+
+    <!-- Детальная информация об автомобиле -->
+    <div class="container" id="car-details-container" style="display: none;">
+        <div class="car-details">
+            <img id="car-image" src="" alt="Car Image">
+            <h2 id="car-name"></h2>
+            <p><strong>Марка:</strong> <span id="car-brand"></span></p>
+            <p><strong>Модель:</strong> <span id="car-model"></span></p>
+            <p><strong>Тип кузова:</strong> <span id="car-body"></span></p>
+            <p><strong>Тип привода:</strong> <span id="car-drive"></span></p>
+            <p><strong>Тип трансмиссии:</strong> <span id="car-transmission"></span></p>
+            <p><strong>Страна-производитель:</strong> <span id="car-country"></span></p>
+            <p><strong>Год выпуска:</strong> <span id="car-year"></span></p>
+            <p><strong>Цвет:</strong> <span id="car-color"></span></p>
+            <p><strong>Клиренс:</strong> <span id="car-clearance"></span></p>
+            <p><strong>Расположение руля:</strong> <span id="car-wheel"></span></p>
+            <p><strong>Объём двигателя:</strong> <span id="car-engine"></span></p>
+            <p><strong>Мощность:</strong> <span id="car-power"></span></p>
+            <p><strong>Объём багажника:</strong> <span id="car-trunk"></span></p>
+            <p><strong>Расход по трассе:</strong> <span id="car-highway"></span></p>
+            <p><strong>Расход по городу:</strong> <span id="car-city"></span></p>
+            <p><strong>Тип топлива:</strong> <span id="car-fuel"></span></p>
+            <p><strong>Цена:</strong> <span id="car-price"></span></p>
+            <button onclick="goBack()">Назад к поиску</button>
         </div>
     </div>
+
+    <script>
+        const cars = [
+            { brand: "Toyota", model: "Camry", image: "https://a.d-cd.net/yT-bxWB84D_Hc3MeQf5Nla6gmjQ-1920.jpg", body: "Седан", drive: "Передний", transmission: "Автомат", country: "Япония", year: 2020, color: "Белый", clearance: "150 мм", wheel: "Левый", engine: "2.5 л", power: "180 л.с.", trunk: "500 л", highway: "7 л/100 км", city: "10 л/100 км", fuel: "Бензин", price: "2 000 000 ₽" },
+            { brand: "Toyota", model: "Rav4", image: "https://via.placeholder.com/280x150?text=Toyota+Rav4", body: "Кроссовер", drive: "Полный", transmission: "Автомат", country: "Япония", year: 2021, color: "Серебристый", clearance: "185 мм", wheel: "Левый", engine: "2.0 л", power: "150 л.с.", trunk: "580 л", highway: "6.5 л/100 км", city: "9 л/100 км", fuel: "Бензин", price: "2 500 000 ₽" },
+            { brand: "BMW", model: "X5", image: "https://via.placeholder.com/280x150?text=BMW+X5", body: "Внедорожник", drive: "Полный", transmission: "Автомат", country: "Германия", year: 2019, color: "Чёрный", clearance: "190 мм", wheel: "Левый", engine: "3.0 л", power: "249 л.с.", trunk: "650 л", highway: "8 л/100 км", city: "12 л/100 км", fuel: "Дизель", price: "4 500 000 ₽" },
+            { brand: "BMW", model: "3 Series", image: "https://via.placeholder.com/280x150?text=BMW+3+Series", body: "Седан", drive: "Задний", transmission: "Автомат", country: "Германия", year: 2020, color: "Белый", clearance: "140 мм", wheel: "Левый", engine: "2.0 л", power: "190 л.с.", trunk: "480 л", highway: "5.8 л/100 км", city: "8.5 л/100 км", fuel: "Бензин", price: "3 000 000 ₽" },
+        ];
+
+        function populateModels() {
+            const brand = document.getElementById("brand").value;
+            const modelSelect = document.getElementById("model");
+            modelSelect.innerHTML = '<option value="">Выберите модель</option>';
+            const filteredModels = cars.filter(car => car.brand === brand).map(car => car.model);
+            filteredModels.forEach(model => {
+                const option = document.createElement("option");
+                option.value = model;
+                option.textContent = model;
+                modelSelect.appendChild(option);
+            });
+        }
+
+        function searchCars() {
+            const brand = document.getElementById("brand").value;
+            const model = document.getElementById("model").value;
+            const resultsContainer = document.getElementById("results");
+            resultsContainer.innerHTML = "";
+            const filteredCars = cars.filter(car => (!brand || car.brand === brand) && (!model || car.model === model));
+            filteredCars.forEach(car => {
+                const carCard = document.createElement("div");
+                carCard.classList.add("car-card");
+                carCard.innerHTML = `
+                    <img src="${car.image}" alt="${car.brand} ${car.model}">
+                    <h3>${car.brand} ${car.model}</h3>
+                `;
+                carCard.onclick = () => showCarDetails(car);
+                resultsContainer.appendChild(carCard);
+            });
+        }
+
+        function showCarDetails(car) {
+            document.getElementById("main-container").style.display = "none";
+            document.getElementById("car-details-container").style.display = "block";
+            document.getElementById("car-image").src = car.image;
+            document.getElementById("car-name").innerText = `${car.brand} ${car.model}`;
+            document.getElementById("car-brand").innerText = car.brand;
+            document.getElementById("car-model").innerText = car.model;
+            document.getElementById("car-body").innerText = car.body;
+            document.getElementById("car-drive").innerText = car.drive;
+            document.getElementById("car-transmission").innerText = car.transmission;
+            document.getElementById("car-country").innerText = car.country;
+            document.getElementById("car-year").innerText = car.year;
+            document.getElementById("car-color").innerText = car.color;
+            document.getElementById("car-clearance").innerText = car.clearance;
+            document.getElementById("car-wheel").innerText = car.wheel;
+            document.getElementById("car-engine").innerText = car.engine;
+            document.getElementById("car-power").innerText = car.power;
+            document.getElementById("car-trunk").innerText = car.trunk;
+            document.getElementById("car-highway").innerText = car.highway;
+            document.getElementById("car-city").innerText = car.city;
+            document.getElementById("car-fuel").innerText = car.fuel;
+            document.getElementById("car-price").innerText = car.price;
+        }
+
+        function goBack() {
+            document.getElementById("main-container").style.display = "block";
+            document.getElementById("car-details-container").style.display = "none";
+        }
+    </script>
 </body>
 </html>
