@@ -356,34 +356,31 @@
     </div>
 
     <script>
-        // Модели автомобилей, привязанные к марке
-        const carModels = {
-            Toyota: ["Corolla", "Camry", "RAV4"],
-            BMW: ["X5", "3 Series", "5 Series"],
-            Audi: ["A4", "A6", "Q7"]
-        };
+        document.getElementById("submit").addEventListener("click", async () => {
+            const formData = new FormData(document.getElementById("filters-section"));
+            const params = Object.fromEntries(formData.entries());
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const carBrandSelect = document.getElementById("car-brand");
-            const carModelSelect = document.getElementById("car-model");
-
-            carBrandSelect.addEventListener("change", () => {
-                const selectedBrand = carBrandSelect.value;
-
-                // Очистка списка моделей
-                carModelSelect.innerHTML = '<option value="">Выберите модель</option>';
-
-                // Заполнение списка моделей для выбранной марки
-                if (carModels[selectedBrand]) {
-                    carModels[selectedBrand].forEach(model => {
-                        const option = document.createElement("option");
-                        option.value = model;
-                        option.textContent = model;
-                        carModelSelect.appendChild(option);
-                    });
-                }
+            const response = await fetch("/search", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(params)
             });
+
+            const results = await response.json();
+            const resultsList = document.getElementById("results-list");
+            resultsList.innerHTML = "";
+
+            if (results.length > 0) {
+                results.forEach(car => {
+                    const listItem = document.createElement("li");
+                    listItem.textContent = `${car.brand} ${car.model} - ${car.price} руб., год: ${car.year}`;
+                    resultsList.appendChild(listItem);
+                });
+            } else {
+                resultsList.innerHTML = "<li>Ничего не найдено</li>";
+            }
         });
     </script>
+
 </body>
 </html>
