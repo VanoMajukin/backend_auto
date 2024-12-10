@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, jsonify
-from db_config import get_db_connection
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from db_config import DB_CONFIG 
 
 app = Flask(__name__)
 
@@ -11,32 +13,57 @@ def index():
 def favicon():
     return send_from_directory('static', 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
+def execute_query(query, params):
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)  # Используем DB_CONFIG
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute(query, params)
+        results = cursor.fetchall()
+        return results
+    except Exception as e:
+        print(f"Ошибка: {e}")
+        return []
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 @app.route("/search", methods=["POST"])
 def search():
     # Получаем параметры из запроса
-    budget = request.form.get("budget")
-    car_type = request.form.get("type")
-    year = request.form.get("year")
+    data = request.get_json()
+    brand = data.get("brand", None)
+    model = data.get("model", None)
+    min_price = data.get("min_price", 0)
+    max_price = data.get("max_price", 10**9)
+    year = data.get("year", None)
 
-    # Формируем запрос к базе данных
+    # SQL-запрос
     query = """
-        SELECT model, price, year, description
-        FROM cars
-        WHERE price <= %s AND car_type = %s AND year >= %s
-        LIMIT 20;
+    SELECT brand, model, price, year
+    FROM cars
+    WHERE (brand ILIKE %s OR %s IS NULL)
+      AND (model ILIKE %s OR %s IS NULL)
+      AND (price BETWEEN %s AND %s)
+      AND (year = %s OR %s IS NULL)
+    ORDER BY price ASC;
     """
-    params = (budget, car_type, year)
+    params = (
+        f"%{brand}%", brand,
+        f"%{model}%", model,
+        min_price, max_price,
+        year, year
+    )
 
     # Выполняем запрос
-    try:
-        conn = get_db_connection()
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(query, params)
-            results = cur.fetchall()
-        conn.close()
-        return jsonify(results)  # Отправляем данные клиенту
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    results = execute_query(query, params)
+    return jsonify(results)
+
+
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=5454, debug=True)
+
+
+
