@@ -10,7 +10,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f9;
+            background-colorcar: #f4f4f9;
         }
         header {
             background-image: url('/static/background_main.jpg'); /* Укажите путь к вашему изображению */
@@ -26,12 +26,12 @@
         }
         header h1 {
             font-size: 40px; /* Увеличенный размер текста */
-            color: white;
+            colorcar: white;
             margin: 0;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Добавлен легкий тень для лучшей читаемости */
         }
         .auth-box {
-            background-color: white;
+            background-colorcar: white;
             padding: 10px;
             border-radius: 5px;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
@@ -49,13 +49,13 @@
             border-radius: 5px;
         }
         .auth-box button {
-            background-color: #3498db;
-            color: white;
+            background-colorcar: #3498db;
+            colorcar: white;
             border: none;
             cursor: pointer;
         }
         .auth-box button:hover {
-            background-color: #2980b9;
+            background-colorcar: #2980b9;
         }
         .container {
             max-width: 1000px; /* Уменьшена ширина формы */
@@ -91,7 +91,7 @@
             margin-top: 20px;
         }
         .filter-group {
-            background-color: #f9f9f9;
+            background-colorcar: #f9f9f9;
             padding: 15px;
             border-radius: 5px;
             border: 1px solid #ddd; /* Добавлена рамка */
@@ -116,8 +116,8 @@
             margin-right: 10px;
         }
         .form-group button {
-            background-color: #3498db;
-            color: white;
+            background-colorcar: #3498db;
+            colorcar: white;
             padding: 12px 25px; /* Увеличен размер кнопки */
             border: none;
             border-radius: 5px;
@@ -127,7 +127,7 @@
             font-size: 16px;
         }
         .form-group button:hover {
-            background-color: #2980b9;
+            background-colorcar: #2980b9;
         }
 
         /* Дополнительные стили для улучшения отображения фильтров */
@@ -146,8 +146,8 @@
         };
 
         document.addEventListener("DOMContentLoaded", () => {
-            const carBrandSelect = document.getElementById("car-brand");
-            const carModelSelect = document.getElementById("car-model");
+            const carBrandSelect = document.getElementById("brandname");
+            const carModelSelect = document.getElementById("modelname");
 
             carBrandSelect.addEventListener("change", () => {
                 const selectedBrand = carBrandSelect.value;
@@ -185,8 +185,8 @@
         <form>
             <h2 class="form-title">Поиск автомобиля</h2>
             <div class="form-group">
-                <label for="car-brand">Марка:</label>
-                <select id="car-brand">
+                <label for="brandname">Марка:</label>
+                <select id="brandname">
                     <option value="">Выберите марку</option>
                     <option value="Toyota">Toyota</option>
                     <option value="BMW">BMW</option>
@@ -194,8 +194,8 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="car-model">Модель:</label>
-                <select id="car-model">
+                <label for="modelname">Модель:</label>
+                <select id="modelname">
                     <option value="">Выберите модель</option>
                 </select>
             </div>
@@ -204,25 +204,25 @@
                 <div class="filter-group">
                     <h3>Тип кузова</h3>
                     <div class="filter-options">
-                        <label><input type="checkbox" name="body-type" value="Sedan"> Седан</label>
-                        <label><input type="checkbox" name="body-type" value="Coupe"> Купе</label>
-                        <label><input type="checkbox" name="body-type" value="SUV"> Внедорожник</label>
+                        <label><input type="checkbox" name="bodytype" value="Sedan"> Седан</label>
+                        <label><input type="checkbox" name="bodytype" value="Coupe"> Купе</label>
+                        <label><input type="checkbox" name="bodytype" value="SUV"> Внедорожник</label>
                     </div>
                 </div>
                 <div class="filter-group">
                     <h3>Тип привода</h3>
                     <div class="filter-options">
-                        <label><input type="checkbox" name="drive-type" value="Front"> Передний</label>
-                        <label><input type="checkbox" name="drive-type" value="Rear"> Задний</label>
-                        <label><input type="checkbox" name="drive-type" value="All"> Полный</label>
+                        <label><input type="checkbox" name="typedrive" value="Front"> Передний</label>
+                        <label><input type="checkbox" name="typedrive" value="Rear"> Задний</label>
+                        <label><input type="checkbox" name="typedrive" value="All"> Полный</label>
                     </div>
                 </div>
                 <div class="filter-group">
                     <h3>Тип трансмиссии</h3>
                     <div class="filter-options">
-                        <label><input type="checkbox" name="transmission" value="Manual"> Механическая</label>
-                        <label><input type="checkbox" name="transmission" value="CVT"> Вариатор</label>
-                        <label><input type="checkbox" name="transmission" value="Automatic"> Автоматическая</label>
+                        <label><input type="checkbox" name="transmissiontype" value="Manual"> Механическая</label>
+                        <label><input type="checkbox" name="transmissiontype" value="CVT"> Вариатор</label>
+                        <label><input type="checkbox" name="transmissiontype" value="Automatic"> Автоматическая</label>
                     </div>
                 </div>
                 <div class="filter-group">
@@ -259,7 +259,7 @@
                 <div class="filter-group">
                     <h3>Страна-производитель</h3>
                     <div class="filter-options">
-                        <select id="car-country">
+                        <select id="countryorigin">
                             <option value="">Выберите страну</option>
                             <option value="Japan">Япония</option>
                             <option value="Germany">Германия</option>
@@ -277,75 +277,75 @@
                 <div class="filter-group">
                     <h3>Цвет</h3>
                     <div class="filter-options">
-                        <label><input type="checkbox" name="color" value="Black"> Черный</label>
-                        <label><input type="checkbox" name="color" value="White"> Белый</label>
-                        <label><input type="checkbox" name="color" value="Blue"> Синий</label>
-                        <label><input type="checkbox" name="color" value="Red"> Красный</label>
-                        <label><input type="checkbox" name="color" value="Yellow"> Жёлтый</label>
-                        <label><input type="checkbox" name="color" value="Green"> Зелёный</label>
-                        <label><input type="checkbox" name="color" value="Silver"> Серебристый</label>
-                        <label><input type="checkbox" name="color" value="Gold"> Золотистый</label>
-                        <label><input type="checkbox" name="color" value="Gray"> Серый</label>
-                        <label><input type="checkbox" name="color" value="Brown"> Коричневый</label>
+                        <label><input type="checkbox" name="colorcar" value="Black"> Черный</label>
+                        <label><input type="checkbox" name="colorcar" value="White"> Белый</label>
+                        <label><input type="checkbox" name="colorcar" value="Blue"> Синий</label>
+                        <label><input type="checkbox" name="colorcar" value="Red"> Красный</label>
+                        <label><input type="checkbox" name="colorcar" value="Yellow"> Жёлтый</label>
+                        <label><input type="checkbox" name="colorcar" value="Green"> Зелёный</label>
+                        <label><input type="checkbox" name="colorcar" value="Silver"> Серебристый</label>
+                        <label><input type="checkbox" name="colorcar" value="Gold"> Золотистый</label>
+                        <label><input type="checkbox" name="colorcar" value="Gray"> Серый</label>
+                        <label><input type="checkbox" name="colorcar" value="Brown"> Коричневый</label>
                     </div>
                 </div>
                 <div class="filter-group">
                     <h3>Расположение руля</h3>
                     <div class="filter-options">
-                        <label><input type="checkbox" name="steering" value="Right"> Справа</label>
-                        <label><input type="checkbox" name="steering" value="Left"> Слева</label>
+                        <label><input type="checkbox" name="wheellocation" value="0"> Справа</label>
+                        <label><input type="checkbox" name="wheellocation" value="1"> Слева</label>
                     </div>
                 </div>
                 <div class="filter-group">
                     <h3>Объём двигателя</h3>
                     <div class="filter-options">
-                        <label><input type="checkbox" name="engine-volume" value="1.5"> до 1.5 л</label>
-                        <label><input type="checkbox" name="engine-volume" value="2.0"> до 2.0 л</label>
-                        <label><input type="checkbox" name="engine-volume" value="3.0"> до 3.0 л</label>
-                        <label><input type="checkbox" name="engine-volume" value="4.0"> до 4.0 л</label>
+                        <label><input type="checkbox" name="enginecapacity" value="1.5"> до 1.5 л</label>
+                        <label><input type="checkbox" name="enginecapacity" value="2.0"> до 2.0 л</label>
+                        <label><input type="checkbox" name="enginecapacity" value="3.0"> до 3.0 л</label>
+                        <label><input type="checkbox" name="enginecapacity" value="4.0"> до 4.0 л</label>
                     </div>
                 </div>
                 <div class="filter-group">
                     <h3>Мощность двигателя</h3>
                     <div class="filter-options">
-                        <label><input type="checkbox" name="engine-power" value="100"> до 100 л.с.</label>
-                        <label><input type="checkbox" name="engine-power" value="150"> до 150 л.с.</label>
-                        <label><input type="checkbox" name="engine-power" value="200"> до 200 л.с.</label>
-                        <label><input type="checkbox" name="engine-power" value="250"> до 250 л.с.</label>
-                        <label><input type="checkbox" name="engine-power" value="300"> до 300 л.с.</label>
-                        <label><input type="checkbox" name="engine-power" value="350"> до 350 л.с.</label>
+                        <label><input type="checkbox" name="enginepower" value="100"> до 100 л.с.</label>
+                        <label><input type="checkbox" name="enginepower" value="150"> до 150 л.с.</label>
+                        <label><input type="checkbox" name="enginepower" value="200"> до 200 л.с.</label>
+                        <label><input type="checkbox" name="enginepower" value="250"> до 250 л.с.</label>
+                        <label><input type="checkbox" name="enginepower" value="300"> до 300 л.с.</label>
+                        <label><input type="checkbox" name="enginepower" value="350"> до 350 л.с.</label>
                     </div>
                 </div>
                 <div class="filter-group">
                     <h3>Тип двигателя</h3>
                     <div class="filter-options">
-                        <label><input type="checkbox" name="engine-type" value="Gasoline"> Бензин</label>
-                        <label><input type="checkbox" name="engine-type" value="Diesel"> Дизель</label>
-                        <label><input type="checkbox" name="engine-type" value="Hybrid"> Гибрид</label>
-                        <label><input type="checkbox" name="engine-type" value="Electric"> Электро</label>
-                        <label><input type="checkbox" name="engine-type" value="Gas"> Газ</label>
+                        <label><input type="checkbox" name="fueltype" value="Gasoline"> Бензин</label>
+                        <label><input type="checkbox" name="fueltype" value="Diesel"> Дизель</label>
+                        <label><input type="checkbox" name="fueltype" value="Hybrid"> Гибрид</label>
+                        <label><input type="checkbox" name="fueltype" value="Electric"> Электро</label>
+                        <label><input type="checkbox" name="fueltype" value="Gas"> Газ</label>
                     </div>
                 </div>
                 <div class="filter-group">
                     <h3>Расход по трассе</h3>
                     <div class="filter-options">
-                        <label><input type="checkbox" name="consumption-highway" value="5"> до 5 л</label>
-                        <label><input type="checkbox" name="consumption-highway" value="8"> до 8 л</label>
-                        <label><input type="checkbox" name="consumption-highway" value="12"> до 12 л</label>
-                        <label><input type="checkbox" name="consumption-highway" value="15"> до 15 л</label>
-                        <label><input type="checkbox" name="consumption-highway" value="18"> до 18 л</label>
-                        <label><input type="checkbox" name="consumption-highway" value="20"> до 20 л</label>
+                        <label><input type="checkbox" name="highway" value="5"> до 5 л</label>
+                        <label><input type="checkbox" name="highway" value="8"> до 8 л</label>
+                        <label><input type="checkbox" name="highway" value="12"> до 12 л</label>
+                        <label><input type="checkbox" name="highway" value="15"> до 15 л</label>
+                        <label><input type="checkbox" name="highway" value="18"> до 18 л</label>
+                        <label><input type="checkbox" name="highway" value="20"> до 20 л</label>
                     </div>
                 </div>
                 <div class="filter-group">
                     <h3>Расход по городу</h3>
                     <div class="filter-options">
-                        <label><input type="checkbox" name="consumption-city" value="5"> до 5 л</label>
-                        <label><input type="checkbox" name="consumption-city" value="8"> до 8 л</label>
-                        <label><input type="checkbox" name="consumption-city" value="12"> до 12 л</label>
-                        <label><input type="checkbox" name="consumption-city" value="15"> до 15 л</label>
-                        <label><input type="checkbox" name="consumption-city" value="18"> до 18 л</label>
-                        <label><input type="checkbox" name="consumption-city" value="20"> до 20 л</label>
+                        <label><input type="checkbox" name="city" value="5"> до 5 л</label>
+                        <label><input type="checkbox" name="city" value="8"> до 8 л</label>
+                        <label><input type="checkbox" name="city" value="12"> до 12 л</label>
+                        <label><input type="checkbox" name="city" value="15"> до 15 л</label>
+                        <label><input type="checkbox" name="city" value="18"> до 18 л</label>
+                        <label><input type="checkbox" name="city" value="20"> до 20 л</label>
                     </div>
                 </div>
             </div>
@@ -357,7 +357,7 @@
 
     <script>
         document.getElementById("submit").addEventListener("click", async () => {
-            const formData = new FormData(document.getElementById("filters-section"));
+            const formData = new FormData(document.getElementById("container"));
             const params = Object.fromEntries(formData.entries());
 
             const response = await fetch("/search", {
@@ -373,7 +373,7 @@
             if (results.length > 0) {
                 results.forEach(car => {
                     const listItem = document.createElement("li");
-                    listItem.textContent = `${car.brand} ${car.model} - ${car.price} руб., год: ${car.year}`;
+                    listItem.textContent = `${car.brandname} ${car.modelname} - ${car.yearrelease}`;
                     resultsList.appendChild(listItem);
                 });
             } else {
