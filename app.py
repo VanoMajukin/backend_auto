@@ -30,10 +30,10 @@ def execute_query(query, params):
         if conn:
             conn.close()
 
-@app.route("/search/cars", methods=["GET"])
+@app.route("/", methods=["GET"])
 def search():
     """Обработка поискового запроса."""
-    data = request.get_json()
+    data = request.get_json(force=True)
     
     # Извлечение диапазона годов
     year_from = data.get("year-from")
