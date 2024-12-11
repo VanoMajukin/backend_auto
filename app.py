@@ -30,7 +30,7 @@ def execute_query(query, params):
         if conn:
             conn.close()
 
-@app.route("/search", methods=["GET"])
+@app.route("/search/cars", methods=["GET"])
 def search():
     """Обработка поискового запроса."""
     data = request.get_json()

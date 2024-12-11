@@ -234,24 +234,24 @@
                         <label for="year-from">От:</label>
                         <select id="year-from">
                             <option value="" disabled selected hidden>Выберите год</option>
-                            <option value="2011">2005</option>
-                            <option value="2013">2010</option>
+                            <option value="2005">2005</option>
+                            <option value="2010">2010</option>
                             <option value="2015">2015</option>
-                            <option value="2018">2020</option>
-                            <option value="2019">2021</option>
-                            <option value="2020">2022</option>
+                            <option value="2020">2020</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
                             <option value="2023">2023</option>
                             <option value="2024">2024</option>
                         </select>
                         <label for="year-to">До:</label>
                         <select id="year-to">
                             <option value="" disabled selected hidden>Выберите год</option>
-                            <option value="2011">2005</option>
-                            <option value="2013">2010</option>
+                            <option value="2005">2005</option>
+                            <option value="2010">2010</option>
                             <option value="2015">2015</option>
-                            <option value="2018">2020</option>
-                            <option value="2019">2021</option>
-                            <option value="2020">2022</option>
+                            <option value="2020">2020</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
                             <option value="2023">2023</option>
                             <option value="2024">2024</option>
                         </select>
@@ -340,13 +340,6 @@
     </div>
 
     <script>
-        // Модели автомобилей, привязанные к марке
-        const carModels = {
-            Toyota: ["Corolla", "RAV4"],
-            Lada: ["Vesta", "Xray"],
-            Jetour: ["X50", "Dashing"]
-        };
-
         document.addEventListener("DOMContentLoaded", () => {
             const carBrandSelect = document.getElementById("brandname");
             const carModelSelect = document.getElementById("modelname");
@@ -369,40 +362,41 @@
             });
 
             // Отправка формы
-            document.getElementById("car-search-form").addEventListener("submit", (event) => {
+            document.getElementById("car-search-form").addEventListener("submit", async (event) => {
                 event.preventDefault();
 
-                const brand = carBrandSelect.value;
-                const model = carModelSelect.value;
+                // Извлечение значений из формы
+                const brand = encodeURIComponent(document.getElementById("car-brand-select").value);
+                const model = encodeURIComponent(document.getElementById("car-model-select").value);
+                const colorcar = encodeURIComponent(document.getElementById("color-select").value);
 
-                fetch(`/api/cars?brand=${brand}&model=${model}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error("Ошибка сервера: " + response.statusText);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        const resultsContainer = document.getElementById("results");
-                        resultsContainer.innerHTML = ""; // Очистка предыдущих результатов
-                        if (data.length === 0) {
-                            resultsContainer.innerHTML = "<p>Нет доступных автомобилей по заданным параметрам.</p>";
-                        } else {
-                            const list = document.createElement("ul");
-                            data.forEach(car => {
-                                const item = document.createElement("li");
-                                item.textContent = `${car.brand} ${car.model} (${car.year})`;
-                                list.appendChild(item);
-                            });
-                            resultsContainer.appendChild(list);
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Ошибка:", error);
-                        document.getElementById("results").innerHTML = "<p>Произошла ошибка при загрузке данных.</p>";
-                    });
+                try {
+                    // Отправка GET-запроса
+                    const response = await fetch(`/search/cars?colorcar=${colorcar}`);
+                    if (!response.ok) {
+                        throw new Error(`Ошибка сервера: ${response.status} ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+                    const resultsContainer = document.getElementById("results");
+                    resultsContainer.innerHTML = ""; // Очистка предыдущих результатов
+
+                    if (data.length === 0) {
+                        resultsContainer.innerHTML = "<p>Нет доступных автомобилей по заданным параметрам.</p>";
+                    } else {
+                        const list = document.createElement("ul");
+                        data.forEach(car => {
+                            const item = document.createElement("li");
+                            item.textContent = `${car.brand} ${car.model} (${car.yearrelease})`;
+                            list.appendChild(item);
+                        });
+                        resultsContainer.appendChild(list);
+                    }
+                } catch (error) {
+                    console.error("Ошибка:", error);
+                    document.getElementById("results").innerHTML = "<p>Произошла ошибка при загрузке данных.</p>";
+                }
             });
-        });
     </script>
 </body>
 </html>
