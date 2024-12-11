@@ -20,6 +20,7 @@ def execute_query(query, params):
         cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute(query, params)
         results = cursor.fetchall()
+        print(results)
         return results
     except Exception as e:
         print(f"Ошибка: {e}")
@@ -31,48 +32,41 @@ def execute_query(query, params):
             conn.close()
 
 @app.route("/search/cars", methods=["POST"])
-def search():
-    """Обработка поискового запроса."""
+def search_cars():
+    """Обработка POST-запроса для поиска автомобилей."""
     try:
-        # Проверяем, что запрос содержит JSON
         if not request.is_json:
             return jsonify({"error": "Invalid Content-Type. Expected application/json."}), 415
-        data = request.get_json(force=True)
-        
-        # Извлечение диапазона годов
-        year_from = data.get("year-from")
-        year_to = data.get("year-to")
 
-        # Остальные параметры
-        brandname = data.get("brandname")
-        modelname = data.get("modelname")
-        bodytype = data.get("bodytype")
-        typedrive = data.get("typedrive")
-        transmissiontype = data.get("transmissiontype")
-        countryorigin = data.get("countryorigin")
-        colorcar = data.get("colorcar")
+        data = request.get_json()
+
+        # Преобразуем данные в массивы
+        def ensure_list(value):
+            if value and not isinstance(value, list):
+                return [value]
+            return value
+
+        brandname = ensure_list(data.get("brandname"))
+        modelname = ensure_list(data.get("modelname"))
+        bodytype = ensure_list(data.get("bodytype"))
+        typedrive = ensure_list(data.get("typedrive"))
+        colorcar = ensure_list(data.get("colorcar"))
         enginecapacity = data.get("enginecapacity")
         enginepower = data.get("enginepower")
-        highway = data.get("highway")
-        city = data.get("city")
-        fueltype = data.get("fueltype")
+        year_from = data.get("year_from")
+        year_to = data.get("year_to")
 
         # SQL-запрос
         query = """
         SELECT *
         FROM cars
-        WHERE (brandname = %s OR %s IS NULL)
-        AND (modelname = %s OR %s IS NULL)
-        AND (bodytype = %s OR %s IS NULL)
-        AND (typedrive = %s OR %s IS NULL)
-        AND (transmissiontype = %s OR %s IS NULL)
-        AND (countryorigin = %s OR %s IS NULL)      
-        AND (colorcar = ANY(%s) OR %s IS NULL)
+        WHERE (brandname @> %s OR %s IS NULL)
+        AND (modelname @> %s OR %s IS NULL)
+        AND (bodytype @> %s OR %s IS NULL)
+        AND (typedrive @> %s OR %s IS NULL)
+        AND (colorcar @> %s OR %s IS NULL)
         AND (enginecapacity = %s OR %s IS NULL)
         AND (enginepower = %s OR %s IS NULL)
-        AND (highway = %s OR %s IS NULL)
-        AND (city = %s OR %s IS NULL)
-        AND (fueltype = %s OR %s IS NULL)
         AND (yearrelease BETWEEN %s AND %s OR (%s IS NULL AND %s IS NULL))
         AND videolink IS NOT NULL
         AND photo IS NOT NULL
@@ -80,28 +74,24 @@ def search():
         ORDER BY yearrelease ASC;
         """
 
-        # Параметры для SQL-запроса
+
         params = (
             brandname, brandname,
             modelname, modelname,
             bodytype, bodytype,
             typedrive, typedrive,
-            transmissiontype, transmissiontype,
-            countryorigin, countryorigin,
             colorcar, colorcar,
             enginecapacity, enginecapacity,
             enginepower, enginepower,
-            highway, highway,
-            city, city,
-            fueltype, fueltype,
             year_from, year_to, year_from, year_to
         )
 
-        # Выполняем запрос
         results = execute_query(query, params)
         return jsonify(results)
+
     except Exception as e:
         return jsonify({"error": f"Server error: {str(e)}"}), 500
+
     
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=5454, debug=True)
