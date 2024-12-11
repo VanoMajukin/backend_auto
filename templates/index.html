@@ -146,8 +146,8 @@
         };
 
         document.addEventListener("DOMContentLoaded", () => {
-            const carBrandSelect = document.getElementById("car-brand");
-            const carModelSelect = document.getElementById("car-model");
+            const carBrandSelect = document.getElementById("brandname");
+            const carModelSelect = document.getElementById("modelname");
 
             carBrandSelect.addEventListener("change", () => {
                 const selectedBrand = carBrandSelect.value;
@@ -343,36 +343,27 @@
         document.addEventListener("DOMContentLoaded", () => {
             const carBrandSelect = document.getElementById("brandname");
             const carModelSelect = document.getElementById("modelname");
-
-            carBrandSelect.addEventListener("change", () => {
-                const selectedBrand = carBrandSelect.value;
-
-                // Очистка списка моделей
-                carModelSelect.innerHTML = '<option value="" disabled selected hidden>Выберите модель</option>';
-
-                // Заполнение списка моделей для выбранной марки
-                if (carModels[selectedBrand]) {
-                    carModels[selectedBrand].forEach(model => {
-                        const option = document.createElement("option");
-                        option.value = model;
-                        option.textContent = model;
-                        carModelSelect.appendChild(option);
-                    });
-                }
-            });
+            
 
             // Отправка формы
             document.getElementById("car-search-form").addEventListener("submit", async (event) => {
                 event.preventDefault();
 
-                // Извлечение значений из формы
-                const brand = encodeURIComponent(document.getElementById("car-brand-select").value);
-                const model = encodeURIComponent(document.getElementById("car-model-select").value);
-                const colorcar = encodeURIComponent(document.getElementById("color-select").value);
+                // Извлекаем значения из полей формы
+                const colorcar = document.getElementById("color-select").value;
+                const brand = document.getElementById("car-brand-select").value;
+                const model = document.getElementById("car-model-select").value;
 
                 try {
-                    // Отправка GET-запроса
-                    const response = await fetch(`/search/cars?colorcar=${colorcar}`);
+                    // Отправка POST-запроса
+                    const response = await fetch("/search/cars", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json" // Указываем тип данных
+                        },
+                        body: JSON.stringify({ colorcar, brand, model }) // Передаём параметры
+                    });
+
                     if (!response.ok) {
                         throw new Error(`Ошибка сервера: ${response.status} ${response.statusText}`);
                     }
@@ -387,7 +378,7 @@
                         const list = document.createElement("ul");
                         data.forEach(car => {
                             const item = document.createElement("li");
-                            item.textContent = `${car.brand} ${car.model} (${car.yearrelease})`;
+                            item.textContent = `${car.brand} ${car.model} (${car.year})`;
                             list.appendChild(item);
                         });
                         resultsContainer.appendChild(list);
@@ -397,6 +388,7 @@
                     document.getElementById("results").innerHTML = "<p>Произошла ошибка при загрузке данных.</p>";
                 }
             });
+
         });
     </script>
 </body>
