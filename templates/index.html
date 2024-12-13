@@ -334,7 +334,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <button type="submit" id="show-results" formmethod="post" href="/search/cars">Показать результаты</button>
+                <button type="submit" id="show-results">Показать результаты</button>
             </div>
         </form>
         <div id="results"></div>
@@ -343,8 +343,9 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const form = document.getElementById("car-search-form");
+            const showResultsButton = document.getElementById("show-results");
 
-            form.addEventListener("show-results", async (event) => {
+            showResultsButton.addEventListener("click", async (event) => {
                 event.preventDefault(); // Предотвращаем стандартное поведение формы
 
                 // Собираем данные из формы
