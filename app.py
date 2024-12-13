@@ -2,12 +2,22 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from db_config import DB_CONFIG 
+import os
 
 app = Flask(__name__)
 
 @app.route("/")
 def index():
     return render_template("index.html")
+# Папка для статических файлов
+
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static')
+
+
+# Путь для отдачи файлов
+@app.route('/static/<path:filename>')
+def serve_static_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 @app.route("/registration")
 def registration():
@@ -94,7 +104,7 @@ def search_cars():
         # Добавляем фильтр только если передан
         conditions.append("wheellocation = %s")
         params.append(data["wheellocation"])
-        
+
     # Объединяем условия с базовым запросом
     if conditions:
         base_query += " AND " + " AND ".join(conditions)
