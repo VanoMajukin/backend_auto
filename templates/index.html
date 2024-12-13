@@ -146,8 +146,8 @@
         };
 
         document.addEventListener("DOMContentLoaded", () => {
-            const carBrandSelect = document.getElementById("car-brand");
-            const carModelSelect = document.getElementById("car-model");
+            const carBrandSelect = document.getElementById("brandname");
+            const carModelSelect = document.getElementById("modelname");
 
             carBrandSelect.addEventListener("change", () => {
                 const selectedBrand = carBrandSelect.value;
@@ -177,7 +177,7 @@
             <form>
                 <input type="login" placeholder="Логин" required>
                 <input type="password" placeholder="Пароль" required>
-                <button type="submit">Войти</button>
+                <button type="submit" id="login">Войти</button>
             </form>
             <div class="register-link">
                 <span>Нет аккаунта? <a href="/registration">Зарегистрироваться</a></span>
@@ -185,11 +185,11 @@
         </div>
     </header>
     <div class="container">
-        <form>
+        <form id="car-search-form">
             <h2 class="form-title">Поиск автомобиля</h2>
             <div class="form-group">
-                <label for="car-brand">Марка:</label>
-                <select id="car-brand">
+                <label for="brandname">Марка:</label>
+                <select id="brandname">
                     <option value="" disabled selected hidden>Выберите марку</option>
                     <option value="Toyota">Toyota</option>
                     <option value="Lada">Lada</option>
@@ -197,8 +197,8 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="car-model">Модель:</label>
-                <select id="car-model">
+                <label for="modelname">Модель:</label>
+                <select id="modelname">
                     <option value="">Выберите модель</option>
                 </select>
             </div>
@@ -334,9 +334,74 @@
                 </div>
             </div>
             <div class="form-group">
-                <button type="submit">Показать результаты</button>
+                <button type="submit" id="show-results" formmethod="post" href="/search/cars">Показать результаты</button>
             </div>
         </form>
+        <div id="results"></div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById("car-search-form");
+
+            form.addEventListener("show-results", async (event) => {
+                event.preventDefault(); // Предотвращаем стандартное поведение формы
+
+                // Собираем данные из формы
+                const formData = new FormData(form);
+                const data = {};
+s
+                // Перебираем поля формы
+                formData.forEach((value, key) => {
+                    // Если ключ уже есть, преобразуем в массив
+                    if (data[key]) {
+                        if (!Array.isArray(data[key])) {
+                            data[key] = [data[key]];
+                        }
+                        data[key].push(value);
+                    } else {
+                        data[key] = value;
+                    }
+                });
+
+                try {
+                    // Отправляем POST-запрос
+                    const response = await fetch("/search/cars", {
+                        method: "post",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Ошибка: ${response.statusText}`);
+                    }
+
+                    // Обрабатываем ответ
+                    const results = await response.json();
+                    console.log(results); // Для теста выводим данные в консоль
+
+                    // TODO: Выведите результаты на странице
+                    const resultsContainer = document.getElementById("results");
+                    resultsContainer.innerHTML = ""; // Очищаем предыдущие результаты
+                    if (results.length === 0) {
+                        resultsContainer.innerHTML = "<p>Нет подходящих автомобилей</p>";
+                    } else {
+                        const list = document.createElement("ul");
+                        results.forEach(car => {
+                            const item = document.createElement("li");
+                            item.textContent = `${car.brandname} ${car.modelname} (${car.yearrelease})`;
+                            list.appendChild(item);
+                        });
+                        resultsContainer.appendChild(list);
+                    }
+                } catch (error) {
+                    console.error("Ошибка при отправке запроса:", error);
+                    alert("Произошла ошибка при выполнении запроса");
+                }
+            });
+        });
+    </script>
 </body>
 </html>
