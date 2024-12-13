@@ -37,64 +37,77 @@ def execute_query(query, params):
 
 @app.route("/search/cars", methods=["POST"])
 def search_cars():
-    """Обработка POST-запроса для поиска автомобилей."""
+    """Обработка POST-запроса для поиска автомобилей с необязательными фильтрами."""
+    if not request.is_json:
+        return jsonify({"error": "Invalid Content-Type. Expected application/json."}), 415
+
+    data = request.get_json()
+
+    # Инициализируем базовый SQL-запрос
+    base_query = """
+    SELECT *
+    FROM cars
+    WHERE videolink IS NOT NULL
+      AND photo IS NOT NULL
+    """
+    conditions = []  # Условия для фильтрации
+    params = []  # Параметры для подстановки
+      
+    # Динамически добавляем условия
+    if "brandname" in data and data["brandname"]:
+        conditions.append("brandname @> ARRAY[%s]::character varying[]")
+        params.append(data["brandname"])
+
+    if "modelname" in data and data["modelname"]:
+        conditions.append("modelname @> ARRAY[%s]::character varying[]")
+        params.append(data["modelname"])
+
+    if "bodytype" in data and data["bodytype"]:
+        conditions.append("bodytype @> ARRAY[%s]::character varying[]")
+        params.append(data["bodytype"])
+
+    if "typedrive" in data and data["typedrive"]:
+        conditions.append("typedrive @> ARRAY[%s]::character varying[]")
+        params.append(data["typedrive"])
+
+    if "colorcar" in data and data["colorcar"]:
+        conditions.append("colorcar @> ARRAY[%s]::character varying[]")
+        params.append(data["colorcar"])
+
+    if "transmissiontype" in data and data["transmissiontype"]:
+        conditions.append("transmissiontype @> ARRAY[%s]::character varying[]")
+        params.append(data["transmissiontype"])
+
+    if "enginecapacity" in data and data["enginecapacity"]:
+        conditions.append("enginecapacity = %s")
+        params.append(data["enginecapacity"])
+
+    if "enginepower" in data and data["enginepower"]:
+        conditions.append("enginepower = %s")
+        params.append(data["enginepower"])
+
+    if "year_from" in data and data["year_from"] and "year_to" in data and data["year_to"]:
+        conditions.append("yearrelease BETWEEN %s AND %s")
+        params.extend([data["year_from"], data["year_to"]])
+    # Логика для wheellocation
+    if "wheellocation" in data and data["wheellocation"] is not None:
+        # Добавляем фильтр только если передан
+        conditions.append("wheellocation = %s")
+        params.append(data["wheellocation"])
+        
+    # Объединяем условия с базовым запросом
+    if conditions:
+        base_query += " AND " + " AND ".join(conditions)
+
+    # Добавляем сортировку
+    base_query += " ORDER BY yearrelease ASC;"
+
+    # Выполняем запрос
     try:
-        if not request.is_json:
-            return jsonify({"error": "Invalid Content-Type. Expected application/json."}), 415
-
-        data = request.get_json()
-
-        # Преобразуем данные в массивы
-        def ensure_list(value):
-            if value and not isinstance(value, list):
-                return [value]
-            return value
-
-        brandname = ensure_list(data.get("brandname"))
-        modelname = ensure_list(data.get("modelname"))
-        bodytype = ensure_list(data.get("bodytype"))
-        typedrive = ensure_list(data.get("typedrive"))
-        colorcar = ensure_list(data.get("colorcar"))
-        enginecapacity = data.get("enginecapacity")
-        enginepower = data.get("enginepower")
-        year_from = data.get("year_from")
-        year_to = data.get("year_to")
-
-        # SQL-запрос
-        query = """
-        SELECT *
-        FROM cars
-        WHERE (brandname @> %s OR %s IS NULL)
-        AND (modelname @> %s OR %s IS NULL)
-        AND (bodytype @> %s OR %s IS NULL)
-        AND (typedrive @> %s OR %s IS NULL)
-        AND (colorcar @> %s OR %s IS NULL)
-        AND (enginecapacity = %s OR %s IS NULL)
-        AND (enginepower = %s OR %s IS NULL)
-        AND (yearrelease BETWEEN %s AND %s OR (%s IS NULL AND %s IS NULL))
-        AND videolink IS NOT NULL
-        AND photo IS NOT NULL
-        AND wheellocation IS NOT NULL
-        ORDER BY yearrelease ASC;
-        """
-
-
-        params = (
-            brandname, brandname,
-            modelname, modelname,
-            bodytype, bodytype,
-            typedrive, typedrive,
-            colorcar, colorcar,
-            enginecapacity, enginecapacity,
-            enginepower, enginepower,
-            year_from, year_to, year_from, year_to
-        )
-
-        results = execute_query(query, params)
+        results = execute_query(base_query, params)
         return jsonify(results)
-
     except Exception as e:
-        return jsonify({"error": f"Server error: {str(e)}"}), 500
+        return jsonify({"error": str(e)}), 500
 
     
 if __name__ == "__main__":
