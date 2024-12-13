@@ -334,7 +334,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <button type="submit" id="show-results" formmethod="post" href="/search/cars">Показать результаты</button>
+                <button type="submit" id="show-results">Показать результаты</button>
             </div>
         </form>
         <div id="results"></div>
@@ -342,65 +342,52 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const form = document.getElementById("car-search-form");
+            const form = document.getElementById("car-search-form");  // Получаем форму по id
+            const showResultsButton = document.getElementById("show-results");  // Получаем кнопку по id
 
-            form.addEventListener("show-results", async (event) => {
-                event.preventDefault(); // Предотвращаем стандартное поведение формы
+            if (form && showResultsButton) {
+                showResultsButton.addEventListener("click", async (event) => {
+                    event.preventDefault(); // Отменяем стандартное поведение кнопки (отправку формы)
 
-                // Собираем данные из формы
-                const formData = new FormData(form);
-                const data = {};
-s
-                // Перебираем поля формы
-                formData.forEach((value, key) => {
-                    // Если ключ уже есть, преобразуем в массив
-                    if (data[key]) {
-                        if (!Array.isArray(data[key])) {
-                            data[key] = [data[key]];
-                        }
-                        data[key].push(value);
-                    } else {
+                    // Собираем данные из формы
+                    const formData = new FormData(form);
+                    const data = {};
+                    formData.forEach((value, key) => {
                         data[key] = value;
-                    }
-                });
-
-                try {
-                    // Отправляем POST-запрос
-                    const response = await fetch("/search/cars", {
-                        method: "post",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(data),
                     });
 
-                    if (!response.ok) {
-                        throw new Error(`Ошибка: ${response.statusText}`);
-                    }
-
-                    // Обрабатываем ответ
-                    const results = await response.json();
-                    console.log(results); // Для теста выводим данные в консоль
-
-                    // TODO: Выведите результаты на странице
-                    const resultsContainer = document.getElementById("results");
-                    resultsContainer.innerHTML = ""; // Очищаем предыдущие результаты
-                    if (results.length === 0) {
-                        resultsContainer.innerHTML = "<p>Нет подходящих автомобилей</p>";
-                    } else {
-                        const list = document.createElement("ul");
-                        results.forEach(car => {
-                            const item = document.createElement("li");
-                            item.textContent = `${car.brandname} ${car.modelname} (${car.yearrelease})`;
-                            list.appendChild(item);
+                    try {
+                        // Отправляем POST-запрос
+                        const response = await fetch("/search/cars", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(data),
                         });
-                        resultsContainer.appendChild(list);
+
+                        const results = await response.json();
+                        console.log(results); // Для теста выводим данные в консоль
+
+                        // TODO: Выведите результаты на странице
+                        const resultsContainer = document.getElementById("results");
+                        resultsContainer.innerHTML = ""; // Очищаем предыдущие результаты
+                        if (results.length === 0) {
+                            resultsContainer.innerHTML = "<p>Нет подходящих автомобилей</p>";
+                        } else {
+                            const list = document.createElement("ul");
+                            results.forEach(car => {
+                                const item = document.createElement("li");
+                                item.textContent = `${car.brandname} ${car.modelname} (${car.yearrelease})`;
+                                list.appendChild(item);
+                            });
+                            resultsContainer.appendChild(list);
+                        }
+                    } catch (error) {
+                        console.error("Ошибка при отправке запроса:", error);
                     }
-                } catch (error) {
-                    console.error("Ошибка при отправке запроса:", error);
-                    alert("Произошла ошибка при выполнении запроса");
-                }
-            });
+                });
+            }
         });
     </script>
 </body>
