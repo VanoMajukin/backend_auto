@@ -9,6 +9,10 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
+@app.route("/registration")
+def registration():
+    return render_template("registration.html")
+
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory('static', 'favicon.png', mimetype='image/png')

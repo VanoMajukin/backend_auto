@@ -1,0 +1,75 @@
+<!-- registration.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoVision</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            height: 100vh; /* Высота на весь экран */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('/static/background_reg.png');
+            background-size: cover; /* Растянуть на весь экран */
+            background-position: center; /* Центрирование */
+            background-repeat: no-repeat; /* Убрать повторение */
+            position: relative;
+        }
+        .registr-box {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9); /* Полупрозрачный белый фон */
+            padding: 10px 20px; /* Уменьшенные отступы внутри */
+            border-radius: 10px; /* Убрать, если не нужно закругление для формы */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            position: absolute;
+            top: 10%; /* Сдвигаем форму выше */
+            transform: translateY(0); /* Центрируем по вертикали */
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 5px; /* Уменьшили отступ снизу */
+            padding-top: 0; /* Убираем отступ сверху у заголовка */
+        }
+        form {
+            text-align: center;
+        }
+        input {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #FFA500; /* Оранжевый цвет */
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #FF8C00; /* Темнее при наведении */
+        }
+    </style>
+</head>
+<body>
+    <div class="registr-box">
+        <h1>Регистрация</h1>
+        <form>
+            <input type="text" placeholder="Логин" required>
+            <input type="password" placeholder="Пароль" required>
+            <input type="password" placeholder="Повторите пароль" required>
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+    </div>
+</body>
+</html>
