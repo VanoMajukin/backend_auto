@@ -96,9 +96,14 @@ def search_cars():
         conditions.append("enginepower = %s")
         params.append(data["enginepower"])
 
-    if ("year-from" in data) and (data["year-from"]) and ("year-to" in data) and (data["year-to"]):
+    if "year-from" in data and data["year-from"] and "year-to" in data and data["year-to"]:
+        # Преобразуем строки в формат даты (начало и конец года)
+        year_from = f"{data['year-from']}-01-01"
+        year_to = f"{data['year-to']}-12-31"
+        
+        # Добавляем условие для yearrelease (между двумя датами)
         conditions.append("yearrelease BETWEEN %s AND %s")
-        params.extend([data["year-from"], data["year-to"]])
+        params.extend([year_from, year_to])
 
     if "countryorigin" in data and data["countryorigin"]:
         conditions.append("countryorigin @> ARRAY[%s]::character varying[]")
