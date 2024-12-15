@@ -391,6 +391,7 @@
                     localStorage.setItem("userLogin", login);
                     alert("Вы успешно вошли!");
                     showAuthorizedState(login);
+                    window.location.reload();
                 } else {
                     alert(result.error || "Ошибка входа!");
                 }
