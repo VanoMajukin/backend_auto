@@ -28,7 +28,7 @@
                     <div id="user-circle" class="avatar-circle"></div> <!-- Кружок -->
                     <span id="user-login">{{ username }}</span> <!-- Имя пользователя -->
                 </div>
-                <button id="favorites-button" onclick="goToFavorites()">Избранное</button>
+                <button id="favorites-button" onclick="goToMain()">На главную</button>
                 <button id="logout-button">Выйти</button>
             </div>
         </div>
@@ -216,6 +216,11 @@
                 return color;
             }
         });
+    </script>
+       <script>
+        function goToMain() {
+            window.location.href = '/';
+        }
     </script>
 </body>
 </html>
