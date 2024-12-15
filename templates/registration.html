@@ -71,5 +71,52 @@
             <button type="submit">Зарегистрироваться</button>
         </form>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.querySelector("form");
+            const submitButton = document.querySelector("button");
+    
+            submitButton.addEventListener("click", async (event) => {
+                event.preventDefault(); // Отменяем стандартное поведение формы
+    
+                // Получаем значения из формы
+                const login = form.querySelector("input[type='text']").value;
+                const password = form.querySelector("input[type='password']").value;
+                const confirmPassword = form.querySelector("input[type='password']:nth-child(3)").value;
+    
+                // Проверяем, совпадают ли пароли
+                if (password !== confirmPassword) {
+                    alert("Пароли не совпадают!");
+                    return;
+                }
+    
+                // Отправляем данные на сервер
+                const data = {
+                    login,
+                    password
+                };
+    
+                try {
+                    const response = await fetch("/registration", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data),
+                    });
+    
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert("Регистрация успешна!");
+                        window.location.href = "/login";  // Перенаправление на страницу логина
+                    } else {
+                        alert(result.error || "Ошибка регистрации!");
+                    }
+                } catch (error) {
+                    console.error("Ошибка при отправке запроса:", error);
+                }
+            });
+        });
+    </script>    
 </body>
 </html>

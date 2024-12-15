@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from db_config import DB_CONFIG 
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 app = Flask(__name__)
@@ -13,15 +14,52 @@ def index():
 
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static')
 
+def get_db_connection():
+    conn = psycopg2.connect(**DB_CONFIG)
+    return conn
 
 # Путь для отдачи файлов
 @app.route('/static/<path:filename>')
 def serve_static_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-@app.route("/registration")
-def registration():
-    return render_template("registration.html")
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        # Получаем данные из запроса
+        data = request.get_json()
+        login = data.get("login")
+        password = data.get("password")
+
+        # Проверка, что поля не пустые
+        if not login or not password:
+            return jsonify({"error": "Логин и пароль обязательны!"}), 400
+
+        # Подключаемся к базе данных
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        try:
+            # Проверяем, есть ли пользователь с таким логином
+            cursor.execute("SELECT * FROM users WHERE login = %s", (login,))
+            user = cursor.fetchone()
+
+            if user:
+                # Проверка пароля с хешированным значением
+                if check_password_hash(user['password'], password):
+                    return jsonify({"message": "Успешный вход!"}), 200
+                else:
+                    return jsonify({"error": "Неверный пароль!"}), 401
+            else:
+                return jsonify({"error": "Пользователь не найден!"}), 404
+
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+        finally:
+            cursor.close()
+            connection.close()
+
+    return render_template("login.html")
 
 @app.route('/favicon.ico')
 def favicon():
@@ -31,7 +69,7 @@ def execute_query(query, params):
     """Выполнение SQL-запроса с параметрами."""
     try:
         conn = psycopg2.connect(**DB_CONFIG)
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cursor.execute(query, params)
         results = cursor.fetchall()
         print(results)
@@ -44,6 +82,38 @@ def execute_query(query, params):
             cursor.close()
         if conn:
             conn.close()
+
+# Регистрация
+@app.route("/registration", methods=["GET", "POST"])
+def registration():
+    if request.method == "POST":
+        # Получаем данные из запроса
+        data = request.get_json()
+        login = data.get("login")
+        password = data.get("password")
+
+        # Проверка, что поля не пустые
+        if not login or not password:
+            return jsonify({"error": "Логин и пароль обязательны!"}), 400
+
+        # Хешируем пароль
+        hashed_password = generate_password_hash(password)
+
+        # SQL-запрос для добавления нового пользователя
+        query = """
+        INSERT INTO public.users (carsid, login, password)
+        VALUES (NULL, %s, %s)
+        """
+        params = (login, hashed_password)
+
+        # Выполнение запроса
+        try:
+            execute_query(query, params)
+            return jsonify({"message": "Регистрация успешна!"}), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    return render_template("registration.html")
 
 @app.route("/search/cars", methods=["POST"])
 def search_cars():
