@@ -99,6 +99,23 @@ def search_cars():
     if "year_from" in data and data["year_from"] and "year_to" in data and data["year_to"]:
         conditions.append("yearrelease BETWEEN %s AND %s")
         params.extend([data["year_from"], data["year_to"]])
+
+    if "countryorigin" in data and data["countryorigin"]:
+        conditions.append("countryorigin @> ARRAY[%s]::character varying[]")
+        params.append(data["countryorigin"])
+
+    if "highway" in data and data["highway"]:
+        conditions.append("highway @> ARRAY[%s]::numeric[]")
+        params.append(data["highway"])
+
+    if "city" in data and data["city"]:
+        conditions.append("city @> ARRAY[%s]::numeric[]")
+        params.append(data["city"])
+
+    if "fueltype" in data and data["fueltype"]:
+        conditions.append("fueltype @> ARRAY[%s]::character varying[]")
+        params.append(data["fueltype"])
+
     # Логика для wheellocation
     if "wheellocation" in data and data["wheellocation"] is not None:
         # Добавляем фильтр только если передан
