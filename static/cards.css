@@ -75,8 +75,12 @@
     font-size: 14px;
     box-sizing: border-box;  /* Включаем отступы и границы в ширину */
     transition: background-color 0.3s ease;
+    margin-bottom: 10px;
 }
 
+.result-card-button:last-child {
+    margin-bottom: 0;  /* Убираем нижний отступ для последней кнопки */
+}
 /* Эффект при наведении на кнопки */
 .result-card-button:hover {
     background-color: #0056b3;
