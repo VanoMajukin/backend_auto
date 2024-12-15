@@ -16,6 +16,12 @@ header {
     top: 20px;
     left: 20px;
 }
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
 header h1 {
     font-size: 40px; /* Увеличенный размер текста */
     color: white;

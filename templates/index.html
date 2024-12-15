@@ -39,18 +39,25 @@
     </script>
 </head>
 <body>
-    <header>
+    <<header>
         <div class="header-content">
             <h1>AutoVision – найди автомобиль своей мечты!</h1>
         </div>
         <div class="auth-box">
-            <form>
-                <input type="login" placeholder="Логин" required>
-                <input type="password" placeholder="Пароль" required>
-                <button type="submit" id="login">Войти</button>
+            <!-- Блок для неавторизованных пользователей -->
+            <form id="login-form" style="display: none;">
+                <input type="text" id="login" placeholder="Логин" required>
+                <input type="password" id="password" placeholder="Пароль" required>
+                <button type="submit" id="login-button">Войти</button>
             </form>
-            <div class="register-link">
+            <div class="register-link" id="register-link" style="display: none;">
                 <span>Нет аккаунта? <a href="/registration">Зарегистрироваться</a></span>
+            </div>
+    
+            <!-- Блок для авторизованных пользователей -->
+            <div id="user-avatar" style="display: none;">
+                <img src="/static/user-avatar.png" alt="Avatar" class="avatar">
+                <button id="logout-button">Выйти</button>
             </div>
         </div>
     </header>
@@ -304,6 +311,74 @@
                 });
             }
         });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+        const loginForm = document.getElementById("login-form");
+        const loginButton = document.getElementById("login-button");
+        const registerLink = document.getElementById("register-link");
+        const userAvatar = document.getElementById("user-avatar");
+        const logoutButton = document.getElementById("logout-button");
+
+        // Проверка состояния авторизации
+        const isAuthorized = localStorage.getItem("authToken");
+
+        if (isAuthorized) {
+            showAuthorizedState();
+        } else {
+            showUnauthorizedState();
+        }
+
+        // Обработка входа
+        loginForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const login = document.getElementById("login").value;
+            const password = document.getElementById("password").value;
+
+            try {
+                const response = await fetch("/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ login, password }),
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    // Сохраняем токен авторизации
+                    localStorage.setItem("authToken", result.token);
+                    alert("Вы успешно вошли!");
+                    showAuthorizedState();
+                } else {
+                    alert(result.error || "Ошибка входа!");
+                }
+            } catch (error) {
+                console.error("Ошибка авторизации:", error);
+            }
+        });
+
+        // Обработка выхода
+        logoutButton.addEventListener("click", () => {
+            localStorage.removeItem("authToken");
+            alert("Вы вышли из системы!");
+            showUnauthorizedState();
+        });
+
+        // Функции для управления интерфейсом
+        function showAuthorizedState() {
+            loginForm.style.display = "none";
+            registerLink.style.display = "none";
+            userAvatar.style.display = "flex";
+        }
+
+        function showUnauthorizedState() {
+            loginForm.style.display = "block";
+            registerLink.style.display = "block";
+            userAvatar.style.display = "none";
+        }
+    });
     </script>
 </body>
 </html>

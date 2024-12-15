@@ -3,7 +3,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from db_config import DB_CONFIG 
 from werkzeug.security import generate_password_hash, check_password_hash
-import os
+import os, datetime, jwt
 
 app = Flask(__name__)
 
@@ -23,43 +23,35 @@ def get_db_connection():
 def serve_static_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-@app.route("/login", methods=["GET", "POST"])
+SECRET_KEY = "81df54d73c6325c24dea59de2ef92d05fc649aefc661bcaf7882000a3d9a2068"
+
+@app.route("/login", methods=["POST"])
 def login():
-    if request.method == "POST":
-        # Получаем данные из запроса
-        data = request.get_json()
-        login = data.get("login")
-        password = data.get("password")
+    data = request.get_json()
+    login = data.get("login")
+    password = data.get("password")
 
-        # Проверка, что поля не пустые
-        if not login or not password:
-            return jsonify({"error": "Логин и пароль обязательны!"}), 400
+    if not login or not password:
+        return jsonify({"error": "Логин и пароль обязательны!"}), 400
 
-        # Подключаемся к базе данных
-        connection = get_db_connection()
-        cursor = connection.cursor()
+    # Проверяем пользователя в базе данных
+    query = "SELECT * FROM users WHERE login = %s"
+    user = execute_query(query, (login,))
+    if not user:
+        return jsonify({"error": "Пользователь не найден!"}), 404
 
-        try:
-            # Проверяем, есть ли пользователь с таким логином
-            cursor.execute("SELECT * FROM users WHERE login = %s", (login,))
-            user = cursor.fetchone()
+    user = user[0]  # Берём первую запись
 
-            if user:
-                # Проверка пароля с хешированным значением
-                if check_password_hash(user['password'], password):
-                    return jsonify({"message": "Успешный вход!"}), 200
-                else:
-                    return jsonify({"error": "Неверный пароль!"}), 401
-            else:
-                return jsonify({"error": "Пользователь не найден!"}), 404
+    if not check_password_hash(user["password"], password):
+        return jsonify({"error": "Неверный пароль!"}), 401
 
-        except Exception as e:
-            return jsonify({"error": str(e)}), 500
-        finally:
-            cursor.close()
-            connection.close()
+    # Генерируем токен
+    token = jwt.encode({
+        "user_id": user["id"],
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+    }, SECRET_KEY, algorithm="HS256")
 
-    return render_template("login.html")
+    return jsonify({"message": "Успешный вход!", "token": token}), 200
 
 @app.route('/favicon.ico')
 def favicon():
