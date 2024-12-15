@@ -42,28 +42,27 @@
     <header>
         <div class="header-content">
             <h1>AutoVision – найди автомобиль своей мечты!</h1>
-        </div>
-        <div class="auth-box">
-            <!-- Блок для неавторизованных пользователей -->
-            <form id="login-form" style="display: none;">
-                <input type="text" id="login" placeholder="Логин" required>
-                <input type="password" id="password" placeholder="Пароль" required>
-                <button type="submit" id="login-button">Войти</button>
-            </form>
-            <div class="register-link" id="register-link" style="display: none;">
-                <span>Нет аккаунта? <a href="/registration">Зарегистрироваться</a></span>
+            {% if authorized %}
+            <!-- Если пользователь авторизован -->
+            <div id="user-panel">
+                <h2>Добро пожаловать, {{ username }}!</h2>
+                <a href="/favorites">Перейти в избранное</a>
+                <a href="/logout">Выйти</a>
             </div>
-    
-            <!-- Блок для авторизованных пользователей -->
-            <div id="user-avatar" style="display: none;">
-                <div id="user-info">
-                    <div id="user-circle" class="avatar-circle"></div> <!-- Кружок -->
-                    <span id="user-login"></span> <!-- Имя пользователя -->
-                </div>
-                <button id="favorites-button" onclick="goToFavorites()">Избранное</button>
-                <button id="logout-button">Выйти</button>
-            </div>                   
-        </div>
+        {% else %}
+            <!-- Если пользователь не авторизован -->
+            <div id="login-panel">
+                <h2>Вход в систему</h2>
+                <form id="login-form">
+                    <label for="login">Логин:</label>
+                    <input type="text" id="login" name="login" required>
+                    <label for="password">Пароль:</label>
+                    <input type="password" id="password" name="password" required>
+                    <button type="submit">Войти</button>
+                </form>
+                <p id="login-error" style="color: red; display: none;">Ошибка входа!</p>
+            </div>
+        {% endif %}
     </header>
     <div class="container">
         <form id="car-search-form">
@@ -316,34 +315,12 @@
             }
         });
     </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-        const loginForm = document.getElementById("login-form");
-        const loginButton = document.getElementById("login-button");
-        const registerLink = document.getElementById("register-link");
-        const userAvatar = document.getElementById("user-avatar");
-        const userLoginSpan = document.getElementById("user-login");
-        const userCircle = document.getElementById("user-circle");
-        const logoutButton = document.getElementById("logout-button");
-
-        // Проверка состояния авторизации
-        const authToken = localStorage.getItem("authToken");
-        const userLogin = localStorage.getItem("userLogin");
-
-        if (authToken && userLogin) {
-            showAuthorizedState(userLogin);
-        } else {
-            showUnauthorizedState();
-        }
-
-        // Обработка входа
-        loginForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
+     <script>
+        document.getElementById("login-form").addEventListener("submit", async function (e) {
+            e.preventDefault();
 
             const login = document.getElementById("login").value;
             const password = document.getElementById("password").value;
-
-            const data = { login, password };
 
             try {
                 const response = await fetch("/login", {
@@ -351,68 +328,28 @@
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(data),
+                    body: JSON.stringify({ login, password }),
                 });
 
                 const result = await response.json();
+
                 if (response.ok) {
-                    // Сохраняем токен авторизации и логин
-                    localStorage.setItem("authToken", result.token);
-                    localStorage.setItem("userLogin", login);
-                    alert("Вы успешно вошли!");
-                    showAuthorizedState(login);
+                    // Логин успешен
+                    document.getElementById("login-panel").style.display = "none";
+                    document.getElementById("user-panel").style.display = "block";
+                    document.getElementById("username").textContent = login;
+
+                    // Опционально: перенаправить на страницу избранного
+                    // window.location.href = "/favorites";
                 } else {
-                    alert(result.error || "Ошибка входа!");
+                    // Ошибка входа
+                    document.getElementById("login-error").style.display = "block";
+                    document.getElementById("login-error").textContent = result.error;
                 }
-            } catch (error) {
-                console.error("Ошибка авторизации:", error);
+            } catch (err) {
+                console.error("Ошибка запроса:", err);
             }
         });
-
-        // Обработка выхода
-        logoutButton.addEventListener("click", () => {
-            localStorage.removeItem("authToken");
-            localStorage.removeItem("userLogin");
-            alert("Вы вышли из системы!");
-            showUnauthorizedState();
-        });
-
-        // Функции для управления интерфейсом
-        function showAuthorizedState(login) {
-            loginForm.style.display = "none";
-            registerLink.style.display = "none";
-            userAvatar.style.display = "flex";
-
-            // Устанавливаем логин и генерируем кружок
-            userLoginSpan.textContent = login;
-            setAvatarCircle(login);
-        }
-
-        function showUnauthorizedState() {
-            loginForm.style.display = "block";
-            registerLink.style.display = "block";
-            userAvatar.style.display = "none";
-        }
-
-        // Устанавливаем аватар с первой буквой логина и случайным цветом
-        function setAvatarCircle(login) {
-            const firstLetter = login.charAt(0).toUpperCase();
-            const randomColor = generateRandomColor();
-
-            userCircle.textContent = firstLetter;
-            userCircle.style.backgroundColor = randomColor;
-        }
-
-        // Генерация случайного цвета
-        function generateRandomColor() {
-            const letters = "0123456789ABCDEF";
-            let color = "#";
-            for (let i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
-            }
-            return color;
-        }
-    });
     </script>
     <script>
         function goToFavorites() {

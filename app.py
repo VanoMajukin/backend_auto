@@ -7,10 +7,15 @@ import os, datetime, jwt
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/", methods=["GET"])
 def index():
-    return render_template("index.html")
-# Папка для статических файлов
+    # Проверяем, авторизован ли пользователь
+    if "user_id" in session:
+        username = session["username"]
+        return render_template("index.html", username=username, authorized=True)
+    else:
+        return render_template("index.html", authorized=False)
+
 
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static')
 
@@ -243,7 +248,7 @@ def favorites():
 @app.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("login_page"))
+    return redirect(url_for("index"))
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=5454, debug=True)
