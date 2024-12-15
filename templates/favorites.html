@@ -15,17 +15,71 @@
             <a href="/logout">Выйти</a>
         </nav>
     </header>
+
     <div class="container">
         <h2>Ваши избранные машины</h2>
+        
         {% if favorites %}
-            <ul>
+            <div class="results-container">
                 {% for car in favorites %}
-                    <li>{{ car.name }} – {{ car.description }}</li>
+                    <div class="result-card">
+                        <!-- Изображение автомобиля -->
+                        <img src="{{ car.photo[0] }}" alt="{{ car.brandname }} {{ car.modelname }}" class="result-card-img">
+
+                        <div class="result-card-content">
+                            <div class="result-card-title">
+                                {{ car.brandname }} {{ car.modelname }}
+                            </div>
+                            <div class="result-card-description">
+                                <p>Год выпуска: {{ car.yearrelease }}</p>
+                                <p>Тип кузова: {{ car.bodytype }}</p>
+                                <p>Цвет: {{ car.colorcar }}</p>
+                                <p>Мощность двигателя: {{ car.enginepower }} л.с.</p>
+                            </div>
+
+                            <!-- Кнопка для просмотра видео -->
+                            <a href="{{ car.videolink }}" target="_blank" class="result-card-button">Посмотреть видео</a>
+
+                            <!-- Кнопка для удаления из избранного -->
+                            <button class="result-card-button remove-from-favorites" data-car-id="{{ car.id }}">Удалить из избранного</button>
+                        </div>
+                    </div>
                 {% endfor %}
-            </ul>
+            </div>
         {% else %}
             <p>У вас нет избранных машин.</p>
         {% endif %}
     </div>
+
+    <script>
+        // Обработчик для удаления автомобиля из избранного
+        document.querySelectorAll('.remove-from-favorites').forEach(button => {
+            button.addEventListener('click', async function() {
+                const carId = this.getAttribute('data-car-id');
+                try {
+                    const response = await fetch('/favorites/remove', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ car_id: carId })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        alert(result.message);  // Уведомление о успешном удалении
+                        window.location.reload(); // Обновление страницы, чтобы отобразить изменения
+                    } else {
+                        alert(result.error);
+                    }
+                } catch (err) {
+                    console.error('Ошибка при удалении из избранного:', err);
+                    alert('Произошла ошибка при удалении машины из избранного.');
+                }
+            });
+        });
+    </script>
+
 </body>
 </html>

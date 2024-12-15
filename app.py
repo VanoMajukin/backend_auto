@@ -283,6 +283,41 @@ def add_to_favorites():
     else:
         return jsonify({"message": "Этот автомобиль уже в избранном!"}), 200
 
+@app.route("/favorites/remove", methods=["POST"])
+def remove_from_favorites():
+    if "user_id" not in session:
+        return jsonify({"error": "Пользователь не авторизован!"}), 401
+
+    data = request.get_json()
+    car_id = data.get("car_id")
+
+    if not car_id:
+        return jsonify({"error": "Необходимо указать ID автомобиля!"}), 400
+
+    user_id = session["user_id"]
+
+    # Получаем текущий список автомобилей в избранном
+    user_query = "SELECT carsid FROM users WHERE id = %s"
+    user_data = execute_query(user_query, (user_id,))
+    if not user_data:
+        return jsonify({"error": "Пользователь не найден!"}), 404
+
+    # Получаем текущий список избранных автомобилей
+    current_favorites = user_data[0]["carsid"] or []
+
+    # Если автомобиля нет в избранном, отправляем ошибку
+    if car_id not in current_favorites:
+        return jsonify({"error": "Автомобиль не найден в вашем избранном!"}), 404
+
+    # Удаляем автомобиль из списка избранных
+    current_favorites.remove(car_id)
+
+    # Обновляем список избранных автомобилей в базе данных
+    update_query = "UPDATE users SET carsid = %s WHERE id = %s"
+    execute_query(update_query, (current_favorites, user_id))
+
+    return jsonify({"message": "Автомобиль успешно удален из избранного!"}), 200
+
 # Выход из системы
 @app.route("/logout")
 def logout():
