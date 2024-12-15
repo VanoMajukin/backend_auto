@@ -39,7 +39,7 @@
     </script>
 </head>
 <body>
-    <<header>
+    <header>
         <div class="header-content">
             <h1>AutoVision – найди автомобиль своей мечты!</h1>
         </div>
@@ -56,7 +56,10 @@
     
             <!-- Блок для авторизованных пользователей -->
             <div id="user-avatar" style="display: none;">
-                <img src="/static/user-avatar.png" alt="Avatar" class="avatar">
+                <div id="user-info">
+                    <span id="user-login"></span> <!-- Логин пользователя -->
+                    <div id="user-circle" class="avatar-circle"></div> <!-- Кружок с буквой -->
+                </div>
                 <button id="logout-button">Выйти</button>
             </div>
         </div>
@@ -318,13 +321,16 @@
         const loginButton = document.getElementById("login-button");
         const registerLink = document.getElementById("register-link");
         const userAvatar = document.getElementById("user-avatar");
+        const userLoginSpan = document.getElementById("user-login");
+        const userCircle = document.getElementById("user-circle");
         const logoutButton = document.getElementById("logout-button");
 
         // Проверка состояния авторизации
-        const isAuthorized = localStorage.getItem("authToken");
+        const authToken = localStorage.getItem("authToken");
+        const userLogin = localStorage.getItem("userLogin");
 
-        if (isAuthorized) {
-            showAuthorizedState();
+        if (authToken && userLogin) {
+            showAuthorizedState(userLogin);
         } else {
             showUnauthorizedState();
         }
@@ -336,21 +342,24 @@
             const login = document.getElementById("login").value;
             const password = document.getElementById("password").value;
 
+            const data = { login, password };
+
             try {
                 const response = await fetch("/login", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ login, password }),
+                    body: JSON.stringify(data),
                 });
 
                 const result = await response.json();
                 if (response.ok) {
-                    // Сохраняем токен авторизации
+                    // Сохраняем токен авторизации и логин
                     localStorage.setItem("authToken", result.token);
+                    localStorage.setItem("userLogin", login);
                     alert("Вы успешно вошли!");
-                    showAuthorizedState();
+                    showAuthorizedState(login);
                 } else {
                     alert(result.error || "Ошибка входа!");
                 }
@@ -362,21 +371,45 @@
         // Обработка выхода
         logoutButton.addEventListener("click", () => {
             localStorage.removeItem("authToken");
+            localStorage.removeItem("userLogin");
             alert("Вы вышли из системы!");
             showUnauthorizedState();
         });
 
         // Функции для управления интерфейсом
-        function showAuthorizedState() {
+        function showAuthorizedState(login) {
             loginForm.style.display = "none";
             registerLink.style.display = "none";
             userAvatar.style.display = "flex";
+
+            // Устанавливаем логин и генерируем кружок
+            userLoginSpan.textContent = login;
+            setAvatarCircle(login);
         }
 
         function showUnauthorizedState() {
             loginForm.style.display = "block";
             registerLink.style.display = "block";
             userAvatar.style.display = "none";
+        }
+
+        // Устанавливаем аватар с первой буквой логина и случайным цветом
+        function setAvatarCircle(login) {
+            const firstLetter = login.charAt(0).toUpperCase();
+            const randomColor = generateRandomColor();
+
+            userCircle.textContent = firstLetter;
+            userCircle.style.backgroundColor = randomColor;
+        }
+
+        // Генерация случайного цвета
+        function generateRandomColor() {
+            const letters = "0123456789ABCDEF";
+            let color = "#";
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
         }
     });
     </script>
