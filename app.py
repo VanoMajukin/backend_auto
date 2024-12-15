@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory, session, redirect
+from flask import Flask, render_template, request, jsonify, send_from_directory, session, redirect, url_for
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from db_config import DB_CONFIG 
@@ -23,39 +23,44 @@ def get_db_connection():
 def serve_static_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+app.secret_key = "87e6023616c1ef012b9a6a63316d17a6264b32f582f94019faf9a4f5355e3b8b"
 SECRET_KEY = "81df54d73c6325c24dea59de2ef92d05fc649aefc661bcaf7882000a3d9a2068"
 
 @app.route("/login", methods=["GET"])
 def login_page():
-    return render_template("login.html")  # Подключаем login.html из папки templates
+    return render_template("login.html")  # Страница логин
 
 @app.route("/login", methods=["POST"])
 def login():
-    data = request.get_json()
-    login = data.get("login")
-    password = data.get("password")
+    try:
+        data = request.get_json()
+        login = data.get("login")
+        password = data.get("password")
 
-    if not login or not password:
-        return jsonify({"error": "Логин и пароль обязательны!"}), 400
+        if not login or not password:
+            return jsonify({"error": "Логин и пароль обязательны!"}), 400
 
-    # Проверяем пользователя в базе данных
-    query = "SELECT * FROM users WHERE login = %s"
-    user = execute_query(query, (login,))
-    if not user:
-        return jsonify({"error": "Пользователь не найден!"}), 404
+        # Проверка пользователя в базе
+        query = "SELECT * FROM users WHERE login = %s"
+        user = execute_query(query, (login,))
+        if not user:
+            return jsonify({"error": "Пользователь не найден!"}), 404
 
-    user = user[0]  # Берём первую запись
+        user = user[0]
 
-    if not check_password_hash(user["password"], password):
-        return jsonify({"error": "Неверный пароль!"}), 401
+        # Проверка пароля
+        if not check_password_hash(user["password"], password):
+            return jsonify({"error": "Неверный пароль!"}), 401
 
-    # Генерируем токен
-    token = jwt.encode({
-        "user_id": user["id"],
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
-    }, SECRET_KEY, algorithm="HS256")
+        # Установка сессии пользователя
+        session["user_id"] = user["id"]
+        session["username"] = user["login"]
 
-    return jsonify({"message": "Успешный вход!", "token": token}), 200
+        return jsonify({"message": "Успешный вход!"}), 200
+
+    except Exception as e:
+        print(f"Ошибка: {e}")
+        return jsonify({"error": "Ошибка сервера"}), 500
 
 @app.route('/favicon.ico')
 def favicon():
@@ -220,50 +225,25 @@ def search_cars():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/favorites')
+@app.route("/favorites", methods=["GET"])
 def favorites():
-    if 'user_id' not in session:
-        return redirect('/login')  # Если пользователь не авторизован
+    if "user_id" not in session:
+        return redirect(url_for("login_page"))  # Перенаправляем на страницу логина
 
-    user_id = session['user_id']
-    try:
-        # Получаем массив carsid для текущего пользователя
-        query_user_cars = "SELECT carsid FROM public.users WHERE id = %s"
-        user_cars = execute_query(query_user_cars, (user_id,))
-        
-        if not user_cars or not user_cars[0]['carsid']:
-            return render_template('favorites.html', cars=[], message="Нет избранных машин.")
+    user_id = session["user_id"]
+    username = session["username"]
 
-        cars_ids = tuple(user_cars[0]['carsid'])  # Извлекаем массив IDs
-        query_cars = "SELECT * FROM public.cars WHERE id IN %s"
-        favorite_cars = execute_query(query_cars, (cars_ids,))
+    # Пример: заглушка для запроса избранных машин из БД
+    query = "SELECT * FROM cars WHERE id = ANY (SELECT UNNEST(carsid) FROM users WHERE id = %s)"
+    favorites = execute_query(query, (user_id,))  # Получаем избранные машины
 
-        return render_template('favorites.html', cars=favorite_cars)
-    except Exception as e:
-        print(f"Ошибка: {e}")
-        return "Ошибка при загрузке избранных машин."
+    return render_template("favorites.html", username=username, favorites=favorites)
 
-@app.route('/add_to_favorites', methods=['POST'])
-def add_to_favorites():
-    if 'user_id' not in session:
-        return jsonify({"message": "Пользователь не авторизован"}), 401
-
-    user_id = session['user_id']
-    data = request.get_json()
-    car_id = data.get('car_id')
-
-    try:
-        # Добавляем car_id в массив carsid
-        query = """
-        UPDATE public.users
-        SET carsid = array_append(carsid, %s)
-        WHERE id = %s AND NOT (%s = ANY(carsid))
-        """
-        execute_query(query, (car_id, user_id, car_id))
-        return jsonify({"message": "Машина добавлена в избранное!"})
-    except Exception as e:
-        print(f"Ошибка: {e}")
-        return jsonify({"message": "Ошибка при добавлении в избранное"}), 500
+# Выход из системы
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login_page"))
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=5454, debug=True)

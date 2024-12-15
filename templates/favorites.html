@@ -3,61 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Избранные машины</title>
-    <style>
-        .car-card {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 15px;
-            margin: 10px;
-            width: 300px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .car-card h3 {
-            margin: 0 0 10px;
-        }
-        .add-favorite {
-            background-color: #0078D7;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .add-favorite:hover {
-            background-color: #005fa3;
-        }
-    </style>
+    <title>AutoVision - Избранное</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/cards.css">
 </head>
 <body>
-    <h1>Избранные машины</h1>
-    {% if message %}
-        <p>{{ message }}</p>
-    {% endif %}
-    <div>
-        {% for car in cars %}
-            <div class="car-card">
-                <h3>{{ car.name }}</h3>
-                <p><strong>Модель:</strong> {{ car.model }}</p>
-                <p><strong>Цена:</strong> {{ car.price }} руб.</p>
-                <p><strong>Год выпуска:</strong> {{ car.year }}</p>
-                <button class="add-favorite" onclick="addToFavorites({{ car.id }})">
-                    Добавить в избранное
-                </button>
-            </div>
-        {% endfor %}
+    <header>
+        <h1>AutoVision – Избранные машины</h1>
+        <nav>
+            <p>Пользователь: {{ username }}</p>
+            <a href="/logout">Выйти</a>
+        </nav>
+    </header>
+    <div class="container">
+        <h2>Ваши избранные машины</h2>
+        {% if favorites %}
+            <ul>
+                {% for car in favorites %}
+                    <li>{{ car.name }} – {{ car.description }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>У вас нет избранных машин.</p>
+        {% endif %}
     </div>
-
-    <script>
-        function addToFavorites(carId) {
-            fetch('/add_to_favorites', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ car_id: carId })
-            }).then(response => response.json())
-              .then(data => alert(data.message))
-              .catch(err => console.error(err));
-        }
-    </script>
 </body>
 </html>
