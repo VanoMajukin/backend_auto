@@ -223,22 +223,22 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const form = document.getElementById("car-search-form");  // Получаем форму по id
-            const showResultsButton = document.getElementById("show-results");  // Получаем кнопку по id
-
+            const form = document.getElementById("car-search-form");
+            const showResultsButton = document.getElementById("show-results");
+    
+            // Проверяем, если кнопка "Показать результаты" существует
             if (form && showResultsButton) {
                 showResultsButton.addEventListener("click", async (event) => {
-                    event.preventDefault(); // Отменяем стандартное поведение кнопки (отправку формы)
-
+                    event.preventDefault();
+    
                     // Собираем данные из формы
                     const formData = new FormData(form);
                     const data = {};
                     formData.forEach((value, key) => {
                         data[key] = value;
                     });
-
+    
                     try {
-                        // Отправляем POST-запрос
                         const response = await fetch("/search/cars", {
                             method: "POST",
                             headers: {
@@ -246,41 +246,33 @@
                             },
                             body: JSON.stringify(data),
                         });
-
+    
                         const results = await response.json();
-                        console.log(results); // Для теста выводим данные в консоль
-
-                        // TODO: Выведите результаты на странице
+    
                         const resultsContainer = document.getElementById("results");
-
-                        resultsContainer.innerHTML = ""; // Очищаем предыдущие результаты
-
+                        resultsContainer.innerHTML = "";
+    
                         if (results.length === 0) {
                             resultsContainer.innerHTML = "<p>Нет подходящих автомобилей</p>";
                         } else {
                             results.forEach(car => {
-                                // Создаём карточку
                                 const card = document.createElement("div");
                                 card.classList.add("result-card");
-
-                                // Создаём изображение
+    
+                                // Изображение
                                 const img = document.createElement("img");
-                                img.src = `${car.photo}`; // Указываем путь к фото
+                                img.src = `${car.photo}`;
                                 img.alt = `${car.brandname} ${car.modelname}`;
-
-                                // Создаём содержимое карточки
+    
                                 const content = document.createElement("div");
                                 content.classList.add("result-card-content");
-
-                                // Название автомобиля
+    
                                 const title = document.createElement("div");
                                 title.classList.add("result-card-title");
                                 title.textContent = `${car.brandname} ${car.modelname}`;
-
-                                // Форматируем дату выпуска
+    
                                 const releaseYear = new Date(car.yearrelease).getFullYear();
-
-                                // Форматируем описание
+    
                                 const description = document.createElement("div");
                                 description.classList.add("result-card-description");
                                 description.innerHTML = `
@@ -289,43 +281,39 @@
                                     <p>Цвет: ${car.colorcar}</p>
                                     <p>Мощность двигателя: ${car.enginepower} л.с.</p>
                                 `;
-
-                                // Кнопка для просмотра видео
+    
                                 const button = document.createElement("a");
                                 button.classList.add("result-card-button");
-                                button.href = `${car.videolink}`; // Указываем путь к видео
-                                button.target = "_blank"; // Открываем видео в новой вкладке
+                                button.href = `${car.videolink}`;
+                                button.target = "_blank";
                                 button.textContent = "Посмотреть видео";
-
-                                // Кнопка "Добавить в избранное" (показывается только для авторизованных пользователей)
+    
+                                // Кнопка "Добавить в избранное" для авторизованных пользователей
                                 const addFavoriteButton = document.createElement("button");
                                 addFavoriteButton.classList.add("result-card-button");
                                 addFavoriteButton.textContent = "Добавить в избранное";
-                                addFavoriteButton.setAttribute("data-car-id", `${car.id}`); // Сохраняем ID автомобиля в атрибуте
-
-                                // Проверка, авторизован ли пользователь (например, проверка токена в локальном хранилище)
-                                if (localStorage.getItem("auth_token")) {
-                                    addFavoriteButton.style.display = "inline-block"; // Показываем кнопку, если авторизован
+                                addFavoriteButton.setAttribute("data-car-id", `${car.id}`);
+    
+                                // Проверяем, авторизован ли пользователь через серверный параметр
+                                if ({{ authorized|tojson }}) {
+                                    addFavoriteButton.style.display = "inline-block";
                                 } else {
-                                    addFavoriteButton.style.display = "none"; // Скрываем кнопку, если не авторизован
+                                    addFavoriteButton.style.display = "none";
                                 }
-
-                                // Обработчик для добавления в избранное
+    
                                 addFavoriteButton.addEventListener("click", async function() {
                                     const carId = this.getAttribute("data-car-id");
-
+    
                                     try {
                                         const response = await fetch("/favorites/add", {
                                             method: "POST",
                                             headers: {
                                                 "Content-Type": "application/json",
-                                                "Authorization": `Bearer ${localStorage.getItem("auth_token")}` // Токен авторизации
                                             },
                                             body: JSON.stringify({ car_id: carId }),
                                         });
-
+    
                                         const result = await response.json();
-
                                         if (response.ok) {
                                             alert("Автомобиль добавлен в избранное!");
                                         } else {
@@ -336,16 +324,16 @@
                                         alert("Произошла ошибка при добавлении в избранное.");
                                     }
                                 });
-
+    
                                 // Собираем карточку
                                 content.appendChild(title);
                                 content.appendChild(description);
                                 content.appendChild(button);
                                 content.appendChild(addFavoriteButton); // Добавляем кнопку "Добавить в избранное"
-
+    
                                 card.appendChild(img);
                                 card.appendChild(content);
-
+    
                                 resultsContainer.appendChild(card);
                             });
                         }
@@ -355,8 +343,8 @@
                 });
             }
         });
-
     </script>
+    
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
