@@ -45,24 +45,25 @@
         </div>
         <div class="auth-box">
             <!-- Блок для неавторизованных пользователей -->
-            <form id="login-form" style="display: none;">
+            <form id="login-form" style="{{ 'display: none;' if authorized else 'display: block;' }}">
                 <input type="text" id="login" placeholder="Логин" required>
                 <input type="password" id="password" placeholder="Пароль" required>
                 <button type="submit" id="login-button">Войти</button>
             </form>
-            <div class="register-link" id="register-link" style="display: none;">
+            <div class="register-link" id="register-link" style="{{ 'display: none;' if authorized else 'display: block;' }}">
                 <span>Нет аккаунта? <a href="/registration">Зарегистрироваться</a></span>
             </div>
-    
+        
             <!-- Блок для авторизованных пользователей -->
-            <div id="user-avatar" style="display: none;">
+            <div id="user-avatar" style="{{ 'display: block;' if authorized else 'display: none;' }}">
                 <div id="user-info">
                     <div id="user-circle" class="avatar-circle"></div> <!-- Кружок -->
-                    <span id="user-login"></span> <!-- Имя пользователя -->
+                    <span id="user-login">{{ username }}</span> <!-- Имя пользователя -->
                 </div>
                 <button id="favorites-button" onclick="goToFavorites()">Избранное</button>
                 <button id="logout-button">Выйти</button>
             </div>                   
+        </div>                  
         </div>
     </header>
     <div class="container">
