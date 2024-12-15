@@ -1,5 +1,4 @@
-/* static/cards.css */
-
+/* Стиль для контейнера карточек */
 .results-container {
     display: flex; /* Включаем Flexbox */
     flex-wrap: wrap; /* Разрешаем перенос элементов на новую строку */
@@ -9,6 +8,7 @@
     padding: 10px; /* Внутренний отступ */
 }
 
+/* Стиль для самой карточки */
 .result-card {
     width: 300px; /* Фиксированная ширина карточки */
     border: 1px solid #ccc;
@@ -17,44 +17,52 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     background-color: #fff;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box; /* Учитываем отступы и границы в общей ширине */
 }
 
+/* Эффект при наведении на карточку */
 .result-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
 
+/* Стиль для изображения в карточке */
 .result-card img {
     width: 100%;
     height: 180px;
     object-fit: cover;
 }
 
+/* Стиль для контента внутри карточки */
 .result-card-content {
     padding: 10px;
     font-family: Arial, sans-serif;
 }
 
+/* Стиль для заголовка в карточке */
 .result-card-title {
     font-size: 18px;
     font-weight: bold;
     margin: 5px 0;
 }
 
+/* Стиль для описания в карточке */
 .result-card-description {
     font-size: 14px;
     color: #555;
     margin: 5px 0;
 }
 
+/* Стиль для контейнера кнопок */
 .result-card-buttons {
     display: flex;
     flex-direction: column;  /* Кнопки друг под другом */
-    gap: 10px;  /* Отступ между кнопками */
+    gap: 15px;  /* Расстояние между кнопками */
     width: 100%;  /* Контейнер для кнопок растягивается на всю ширину */
     box-sizing: border-box;  /* Включаем отступы и границы в общую ширину */
 }
 
+/* Стиль для кнопок */
 .result-card-button {
     display: block;  /* Каждая кнопка занимает всю ширину контейнера */
     width: 100%;  /* Растягиваем на 100% ширины */
@@ -69,11 +77,12 @@
     transition: background-color 0.3s ease;
 }
 
+/* Эффект при наведении на кнопки */
 .result-card-button:hover {
     background-color: #0056b3;
 }
 
-
+/* Стиль для результатов */
 #results {
     display: flex; /* Включаем Flexbox */
     flex-wrap: wrap; /* Позволяем карточкам переноситься */
