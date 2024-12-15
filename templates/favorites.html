@@ -169,8 +169,8 @@
                     // Обновляем интерфейс
                     showUnauthorizedState();
                     document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                    // Обновляем страницу
-                    window.location.reload();  // Перезагружаем страницу
+                    // Перенаправляем на главную страницу
+                    window.location.href = "/";  
                 } else {
                     alert("Ошибка при выходе!");
                 }
