@@ -418,7 +418,7 @@
                 alert("Вы вышли из системы!");
                 // Обновляем интерфейс
                 showUnauthorizedState();
-
+                document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                 // Обновляем страницу
                 window.location.reload();  // Перезагружаем страницу
             } else {
@@ -466,28 +466,6 @@
             return color;
         }
     });
-    </script>
-    <script>
-        document.getElementById("logout-button").addEventListener("click", async () => {
-            try {
-                // Отправляем запрос на сервер для выхода
-                const response = await fetch("/logout", {
-                    method: "GET",
-                    credentials: "same-origin",  // Отправляем сессионные данные
-                });
-
-                if (response.ok) {
-                    alert("Вы успешно вышли из системы!");
-                    // Перезагружаем страницу, чтобы обновить состояние
-                    window.location.reload();  // Перезагружаем страницу
-                } else {
-                    alert("Ошибка при выходе из системы.");
-                }
-            } catch (error) {
-                console.error("Ошибка при выходе:", error);
-                alert("Произошла ошибка при выходе.");
-            }
-        });
     </script>
     <script>
         function goToFavorites() {

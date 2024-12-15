@@ -3,8 +3,8 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from db_config import DB_CONFIG 
 from werkzeug.security import generate_password_hash, check_password_hash
-import os, datetime, jwt
-
+import os, jwt
+from datetime import datetime, timedelta
 app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
@@ -326,11 +326,11 @@ def remove_from_favorites():
 
     return jsonify({"message": "Автомобиль успешно удален из избранного!"}), 200
 
-# Выход из системы
 @app.route("/logout")
 def logout():
-    session.clear()  # Очищаем все данные сессии
-    return redirect(url_for("index"))  # Перенаправляем на главную страницу
+    session.clear()  # Очистка всех данных сессии
+    resp = redirect(url_for("index"))  # Перенаправляем на главную страницу после выхода
+    return resp
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=5454, debug=True)

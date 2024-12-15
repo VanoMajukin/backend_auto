@@ -92,8 +92,9 @@
 
             if (response.ok) {
                 alert("Вы успешно вышли из системы!");
-                // Перенаправляем на главную страницу
-                window.location.href = "/";  // Перезагружаем страницу и отправляем на главную
+                // После выхода обновляем интерфейс
+                showUnauthorizedState();
+                window.location.href = "/";  // Перенаправляем на главную страницу
             } else {
                 alert("Ошибка при выходе из системы.");
             }
@@ -102,6 +103,28 @@
             alert("Произошла ошибка при выходе.");
         }
     });
+
+    // Функция для отображения состояния "не авторизован"
+    function showUnauthorizedState() {
+        // Показываем форму входа и скрываем панель для авторизованных пользователей
+        document.getElementById("login-form").style.display = "block";
+        document.getElementById("register-link").style.display = "block";
+        document.getElementById("user-avatar").style.display = "none";  // скрыть панель с информацией о пользователе
+        document.getElementById("favorites-button").style.display = "none";  // скрыть кнопку "Избранное"
+        document.getElementById("logout-button").style.display = "none";  // скрыть кнопку "Выйти"
+    }
+
+    // Функция для отображения состояния "авторизован"
+    function showAuthorizedState(username) {
+        // Показываем панель с информацией о пользователе
+        document.getElementById("user-avatar").style.display = "block";
+        document.getElementById("user-login").textContent = username;  // Показываем имя пользователя
+        document.getElementById("favorites-button").style.display = "inline-block";  // Показываем кнопку "Избранное"
+        document.getElementById("logout-button").style.display = "inline-block";  // Показываем кнопку "Выйти"
+        // Скрываем форму входа
+        document.getElementById("login-form").style.display = "none";
+        document.getElementById("register-link").style.display = "none";
+    }
     </script>
 
 </body>
