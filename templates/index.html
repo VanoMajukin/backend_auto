@@ -254,7 +254,7 @@
 
                                 // Создаём изображение
                                 const img = document.createElement("img");
-                                img.src = `/static/${car.photo}`; // Указываем путь к фото из JSON
+                                img.src = `${car.photo}`; // Указываем путь к фото из JSON
                                 img.alt = `${car.brandname} ${car.modelname}`;
 
                                 // Создаём содержимое карточки
@@ -279,7 +279,7 @@
                                 // Кнопка
                                 const button = document.createElement("a");
                                 button.classList.add("result-card-button");
-                                button.href = `/static/${car.video}`; // Указываем путь к видео из JSON
+                                button.href = `${car.video}`; // Указываем путь к видео из JSON
                                 button.target = "_blank"; // Открываем видео в новой вкладке
                                 button.textContent = "Посмотреть видео";
 
