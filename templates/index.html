@@ -254,7 +254,7 @@
 
                                 // Создаём изображение
                                 const img = document.createElement("img");
-                                img.src = `${car.photo}`; // Указываем путь к фото из JSON
+                                img.src = `${car.photo}`; // Указываем путь к фото
                                 img.alt = `${car.brandname} ${car.modelname}`;
 
                                 // Создаём содержимое карточки
@@ -266,20 +266,23 @@
                                 title.classList.add("result-card-title");
                                 title.textContent = `${car.brandname} ${car.modelname}`;
 
-                                // Краткое описание
+                                // Форматируем дату выпуска
+                                const releaseYear = new Date(car.yearrelease).getFullYear();
+
+                                // Форматируем описание
                                 const description = document.createElement("div");
                                 description.classList.add("result-card-description");
-                                description.textContent = `
-                                    Год выпуска: ${car.yearrelease}
-                                    Тип кузова: ${car.bodytype}
-                                    Цвет: ${car.colorcar}
-                                    Мощность двигателя: ${car.enginepower} л.с.
+                                description.innerHTML = `
+                                    <p>Год выпуска: ${releaseYear}</p>
+                                    <p>Тип кузова: ${car.bodytype}</p>
+                                    <p>Цвет: ${car.colorcar}</p>
+                                    <p>Мощность двигателя: ${car.enginepower} л.с.</p>
                                 `;
 
-                                // Кнопка
+                                // Кнопка для просмотра видео
                                 const button = document.createElement("a");
                                 button.classList.add("result-card-button");
-                                button.href = `${car.videolink}`; // Указываем путь к видео из JSON
+                                button.href = `${car.videolink}`; // Указываем путь к видео
                                 button.target = "_blank"; // Открываем видео в новой вкладке
                                 button.textContent = "Посмотреть видео";
 
@@ -293,6 +296,7 @@
 
                                 resultsContainer.appendChild(card);
                             });
+
                         }
                     } catch (error) {
                         console.error("Ошибка при отправке запроса:", error);
