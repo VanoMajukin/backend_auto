@@ -111,13 +111,16 @@ def search_cars():
         conditions.append("countryorigin @> ARRAY[%s]::character varying[]")
         params.append(data["countryorigin"])
 
+    # Проверка для highway
     if "highway" in data and data["highway"]:
-        conditions.append("highway @> ARRAY[%s]::numeric[]")
-        params.append(data["highway"])
+        conditions.append("highway @> ARRAY[%s]::numeric[] OR EXISTS (SELECT 1 FROM unnest(highway) AS h WHERE h <= %s)")
+        params.extend([data["highway"], data["highway"]])  # Добавляем значение дважды, так как оно используется в двух частях условия
 
+    # Проверка для city
     if "city" in data and data["city"]:
-        conditions.append("city @> ARRAY[%s]::numeric[]")
-        params.append(data["city"])
+        conditions.append("city @> ARRAY[%s]::numeric[] OR EXISTS (SELECT 1 FROM unnest(city) AS c WHERE c <= %s)")
+        params.extend([data["city"], data["city"]])  # Добавляем значение дважды
+
 
     if "fueltype" in data and data["fueltype"]:
         conditions.append("fueltype @> ARRAY[%s]::character varying[]")
