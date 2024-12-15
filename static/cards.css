@@ -47,22 +47,32 @@
     margin: 5px 0;
 }
 
+.result-card-buttons {
+    display: flex;
+    flex-direction: column;  /* Кнопки друг под другом */
+    gap: 10px;  /* Отступ между кнопками */
+    width: 100%;  /* Контейнер для кнопок растягивается на всю ширину */
+    box-sizing: border-box;  /* Включаем отступы и границы в общую ширину */
+}
+
 .result-card-button {
-    display: block;
-    margin: 10px 0 0;
-    padding: 8px 16px;
+    display: block;  /* Каждая кнопка занимает всю ширину контейнера */
+    width: 100%;  /* Растягиваем на 100% ширины */
+    padding: 10px 20px;  /* Добавляем отступы внутри кнопки */
     background-color: #007bff;
     color: #fff;
     text-align: center;
     border-radius: 4px;
     text-decoration: none;
     font-size: 14px;
+    box-sizing: border-box;  /* Включаем отступы и границы в ширину */
     transition: background-color 0.3s ease;
 }
 
 .result-card-button:hover {
     background-color: #0056b3;
 }
+
 
 #results {
     display: flex; /* Включаем Flexbox */

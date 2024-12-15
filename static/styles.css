@@ -31,6 +31,7 @@ header {
     padding: 10px 20px;
     cursor: pointer;
     font-size: 14px;
+    text-align: center;
 }
 
 #favorites-button:hover {
@@ -181,7 +182,6 @@ header h1 {
 .form-group button:hover {
     background-color: #0056b3;
 }
-
 /* Дополнительные стили для улучшения отображения фильтров */
 @media (max-width: 768px) {
     .filters-section {
