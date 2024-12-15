@@ -301,7 +301,7 @@
                                 const addFavoriteButton = document.createElement("button");
                                 addFavoriteButton.classList.add("result-card-button");
                                 addFavoriteButton.textContent = "Добавить в избранное";
-                                addFavoriteButton.setAttribute("data-car-id", car.id); // Сохраняем ID автомобиля в атрибуте
+                                addFavoriteButton.setAttribute("data-car-id", `${car.id}`); // Сохраняем ID автомобиля в атрибуте
 
                                 // Проверка, авторизован ли пользователь (например, проверка токена в локальном хранилище)
                                 if (localStorage.getItem("auth_token")) {
@@ -315,7 +315,7 @@
                                     const carId = this.getAttribute("data-car-id");
 
                                     try {
-                                        const response = await fetch("/add_to_favorites", {
+                                        const response = await fetch("/favorites/add", {
                                             method: "POST",
                                             headers: {
                                                 "Content-Type": "application/json",

@@ -237,11 +237,51 @@ def favorites():
     user_id = session["user_id"]
     username = session["username"]
 
-    # Пример: заглушка для запроса избранных машин из БД
+    # Загружаем список избранных автомобилей для пользователя
     query = "SELECT * FROM cars WHERE id = ANY (SELECT UNNEST(carsid) FROM users WHERE id = %s)"
-    favorites = execute_query(query, (user_id,))  # Получаем избранные машины
+    favorites = execute_query(query, (user_id,))  # Получаем избранные автомобили
 
     return render_template("favorites.html", username=username, favorites=favorites)
+
+@app.route("/favorites/add", methods=["POST"])
+def add_to_favorites():
+    if "user_id" not in session:
+        return jsonify({"error": "Пользователь не авторизован!"}), 401
+
+    user_id = session["user_id"]
+    data = request.get_json()
+
+    # Проверяем, передан ли ID автомобиля
+    car_id = data.get("car_id")
+    if not car_id:
+        return jsonify({"error": "Необходимо указать ID автомобиля!"}), 400
+
+    # Проверяем, существует ли такой автомобиль в базе
+    car_query = "SELECT * FROM cars WHERE id = %s"
+    car = execute_query(car_query, (car_id,))
+    if not car:
+        return jsonify({"error": "Автомобиль не найден!"}), 404
+
+    # Получаем список избранных автомобилей пользователя
+    user_query = "SELECT carsid FROM users WHERE id = %s"
+    user_data = execute_query(user_query, (user_id,))
+    if not user_data:
+        return jsonify({"error": "Пользователь не найден!"}), 404
+
+    # Получаем текущий список автомобилей в избранном
+    current_favorites = user_data[0]["carsid"] or []
+
+    # Добавляем новый автомобиль в список избранных
+    if car_id not in current_favorites:
+        current_favorites.append(car_id)
+
+        # Обновляем список избранных автомобилей в базе данных
+        update_query = "UPDATE users SET carsid = %s WHERE id = %s"
+        execute_query(update_query, (current_favorites, user_id))
+
+        return jsonify({"message": "Автомобиль успешно добавлен в избранное!"}), 200
+    else:
+        return jsonify({"message": "Этот автомобиль уже в избранном!"}), 200
 
 # Выход из системы
 @app.route("/logout")
