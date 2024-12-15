@@ -1,16 +1,16 @@
 /* static/cards.css */
 
 .results-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-top: 20px;
-    padding: 10px;
-    justify-content: center;
+    display: flex; /* Включаем Flexbox */
+    flex-wrap: wrap; /* Разрешаем перенос элементов на новую строку */
+    gap: 16px; /* Расстояние между карточками */
+    justify-content: center; /* Центрируем карточки по горизонтали */
+    margin-top: 20px; /* Отступ сверху */
+    padding: 10px; /* Внутренний отступ */
 }
 
 .result-card {
-    width: 300px;
+    width: 300px; /* Фиксированная ширина карточки */
     border: 1px solid #ccc;
     border-radius: 8px;
     overflow: hidden;
@@ -62,4 +62,12 @@
 
 .result-card-button:hover {
     background-color: #0056b3;
+}
+
+#results {
+    display: flex; /* Включаем Flexbox */
+    flex-wrap: wrap; /* Позволяем карточкам переноситься */
+    gap: 16px; /* Расстояние между карточками */
+    justify-content: center; /* Центрируем карточки */
+    padding: 10px;
 }
