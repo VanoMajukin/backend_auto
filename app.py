@@ -88,12 +88,14 @@ def search_cars():
         conditions.append("transmissiontype @> ARRAY[%s]::character varying[]")
         params.append(data["transmissiontype"])
 
+    # Проверка для enginecapacity
     if "enginecapacity" in data and data["enginecapacity"]:
-        conditions.append("enginecapacity = %s")
+        conditions.append("enginecapacity <= %s")  # Ищем значения меньше или равные переданному значению
         params.append(data["enginecapacity"])
 
+    # Проверка для enginepower
     if "enginepower" in data and data["enginepower"]:
-        conditions.append("enginepower = %s")
+        conditions.append("enginepower <= %s")  # Ищем значения меньше или равные переданному значению
         params.append(data["enginepower"])
 
     if "year-from" in data and data["year-from"] and "year-to" in data and data["year-to"]:
