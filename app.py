@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_from_directory, session, redirect
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from db_config import DB_CONFIG 
@@ -24,6 +24,10 @@ def serve_static_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 SECRET_KEY = "81df54d73c6325c24dea59de2ef92d05fc649aefc661bcaf7882000a3d9a2068"
+
+@app.route("/login", methods=["GET"])
+def login_page():
+    return render_template("login.html")  # Подключаем login.html из папки templates
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -216,7 +220,51 @@ def search_cars():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-    
+@app.route('/favorites')
+def favorites():
+    if 'user_id' not in session:
+        return redirect('/login')  # Если пользователь не авторизован
+
+    user_id = session['user_id']
+    try:
+        # Получаем массив carsid для текущего пользователя
+        query_user_cars = "SELECT carsid FROM public.users WHERE id = %s"
+        user_cars = execute_query(query_user_cars, (user_id,))
+        
+        if not user_cars or not user_cars[0]['carsid']:
+            return render_template('favorites.html', cars=[], message="Нет избранных машин.")
+
+        cars_ids = tuple(user_cars[0]['carsid'])  # Извлекаем массив IDs
+        query_cars = "SELECT * FROM public.cars WHERE id IN %s"
+        favorite_cars = execute_query(query_cars, (cars_ids,))
+
+        return render_template('favorites.html', cars=favorite_cars)
+    except Exception as e:
+        print(f"Ошибка: {e}")
+        return "Ошибка при загрузке избранных машин."
+
+@app.route('/add_to_favorites', methods=['POST'])
+def add_to_favorites():
+    if 'user_id' not in session:
+        return jsonify({"message": "Пользователь не авторизован"}), 401
+
+    user_id = session['user_id']
+    data = request.get_json()
+    car_id = data.get('car_id')
+
+    try:
+        # Добавляем car_id в массив carsid
+        query = """
+        UPDATE public.users
+        SET carsid = array_append(carsid, %s)
+        WHERE id = %s AND NOT (%s = ANY(carsid))
+        """
+        execute_query(query, (car_id, user_id, car_id))
+        return jsonify({"message": "Машина добавлена в избранное!"})
+    except Exception as e:
+        print(f"Ошибка: {e}")
+        return jsonify({"message": "Ошибка при добавлении в избранное"}), 500
+
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=5454, debug=True)
 

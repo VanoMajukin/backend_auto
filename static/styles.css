@@ -23,6 +23,20 @@ header {
     gap: 10px; /* Отступы между элементами */
 }
 
+#favorites-button {
+    background-color: #28a745; /* Зеленый цвет */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#favorites-button:hover {
+    background-color: #218838; /* Темно-зеленый цвет при наведении */
+}
+
 #user-info {
     display: flex;
     align-items: center; /* Центрирование кружка и имени пользователя по вертикали */

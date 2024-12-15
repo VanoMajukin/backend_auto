@@ -60,8 +60,9 @@
                     <div id="user-circle" class="avatar-circle"></div> <!-- Кружок -->
                     <span id="user-login"></span> <!-- Имя пользователя -->
                 </div>
-                <button id="logout-button">Выйти</button> <!-- Кнопка выхода -->
-            </div>            
+                <button id="favorites-button" onclick="goToFavorites()">Избранное</button>
+                <button id="logout-button">Выйти</button>
+            </div>                   
         </div>
     </header>
     <div class="container">
@@ -412,6 +413,11 @@
             return color;
         }
     });
+    </script>
+    <script>
+        function goToFavorites() {
+            window.location.href = '/favorites';
+        }
     </script>
 </body>
 </html>
