@@ -16,7 +16,6 @@ def index():
     else:
         return render_template("index.html", authorized=False)
 
-
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static')
 
 def get_db_connection():
@@ -248,7 +247,7 @@ def favorites():
 @app.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("index"))
+    return redirect(url_for("login_page"))
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=5454, debug=True)
