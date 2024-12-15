@@ -256,28 +256,32 @@ def add_to_favorites():
     if not car_id:
         return jsonify({"error": "Необходимо указать ID автомобиля!"}), 400
 
-    # Проверяем, существует ли такой автомобиль в базе
+    # Проверка, существует ли такой автомобиль
     car_query = "SELECT * FROM cars WHERE id = %s"
     car = execute_query(car_query, (car_id,))
     if not car:
         return jsonify({"error": "Автомобиль не найден!"}), 404
 
-    # Получаем список избранных автомобилей пользователя
+    # Получаем текущий список автомобилей в избранном
     user_query = "SELECT carsid FROM users WHERE id = %s"
     user_data = execute_query(user_query, (user_id,))
     if not user_data:
         return jsonify({"error": "Пользователь не найден!"}), 404
 
-    # Получаем текущий список автомобилей в избранном
+    # Если carsid пуст, то инициализируем пустой массив, иначе добавляем в список
     current_favorites = user_data[0]["carsid"] or []
 
     # Добавляем новый автомобиль в список избранных
     if car_id not in current_favorites:
         current_favorites.append(car_id)
 
-        # Обновляем список избранных автомобилей в базе данных
-        update_query = "UPDATE users SET carsid = %s WHERE id = %s"
-        execute_query(update_query, (current_favorites, user_id))
+        # Обновляем список избранных в базе данных с учетом возможного NULL
+        update_query = """
+        UPDATE users 
+        SET carsid = COALESCE(carsid, '{}') || ARRAY[%s]::integer[] 
+        WHERE id = %s
+        """
+        execute_query(update_query, (car_id, user_id))
 
         return jsonify({"message": "Автомобиль успешно добавлен в избранное!"}), 200
     else:
@@ -302,8 +306,12 @@ def remove_from_favorites():
     if not user_data:
         return jsonify({"error": "Пользователь не найден!"}), 404
 
-    # Получаем текущий список избранных автомобилей
+    # Получаем текущий список избранных автомобилей (массив чисел)
     current_favorites = user_data[0]["carsid"] or []
+
+    # Приводим car_id и элементы current_favorites к целым числам
+    car_id = int(car_id)  # Преобразуем car_id в целое число
+    current_favorites = [int(favorite) for favorite in current_favorites]  # Преобразуем элементы массива в целые числа
 
     # Если автомобиля нет в избранном, отправляем ошибку
     if car_id not in current_favorites:
