@@ -297,17 +297,57 @@
                                 button.target = "_blank"; // Открываем видео в новой вкладке
                                 button.textContent = "Посмотреть видео";
 
+                                // Кнопка "Добавить в избранное" (показывается только для авторизованных пользователей)
+                                const addFavoriteButton = document.createElement("button");
+                                addFavoriteButton.classList.add("result-card-button");
+                                addFavoriteButton.textContent = "Добавить в избранное";
+                                addFavoriteButton.setAttribute("data-car-id", car.id); // Сохраняем ID автомобиля в атрибуте
+
+                                // Проверка, авторизован ли пользователь (например, проверка токена в локальном хранилище)
+                                if (localStorage.getItem("auth_token")) {
+                                    addFavoriteButton.style.display = "inline-block"; // Показываем кнопку, если авторизован
+                                } else {
+                                    addFavoriteButton.style.display = "none"; // Скрываем кнопку, если не авторизован
+                                }
+
+                                // Обработчик для добавления в избранное
+                                addFavoriteButton.addEventListener("click", async function() {
+                                    const carId = this.getAttribute("data-car-id");
+
+                                    try {
+                                        const response = await fetch("/add_to_favorites", {
+                                            method: "POST",
+                                            headers: {
+                                                "Content-Type": "application/json",
+                                                "Authorization": `Bearer ${localStorage.getItem("auth_token")}` // Токен авторизации
+                                            },
+                                            body: JSON.stringify({ car_id: carId }),
+                                        });
+
+                                        const result = await response.json();
+
+                                        if (response.ok) {
+                                            alert("Автомобиль добавлен в избранное!");
+                                        } else {
+                                            alert("Ошибка при добавлении в избранное: " + result.error);
+                                        }
+                                    } catch (err) {
+                                        console.error("Ошибка при добавлении в избранное:", err);
+                                        alert("Произошла ошибка при добавлении в избранное.");
+                                    }
+                                });
+
                                 // Собираем карточку
                                 content.appendChild(title);
                                 content.appendChild(description);
                                 content.appendChild(button);
+                                content.appendChild(addFavoriteButton); // Добавляем кнопку "Добавить в избранное"
 
                                 card.appendChild(img);
                                 card.appendChild(content);
 
                                 resultsContainer.appendChild(card);
                             });
-
                         }
                     } catch (error) {
                         console.error("Ошибка при отправке запроса:", error);
@@ -315,7 +355,9 @@
                 });
             }
         });
+
     </script>
+
     <script>
         document.addEventListener("DOMContentLoaded", () => {
         const loginForm = document.getElementById("login-form");
