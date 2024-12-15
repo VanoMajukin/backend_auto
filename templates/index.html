@@ -5,138 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AutoVision</title>
     <link rel="icon" href="/static/favicon.png" type="image/png">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-        }
-        header {
-            background-image: url('/static/background_main.jpg'); /* Укажите путь к вашему изображению */
-            background-size: cover;
-            background-position: center;
-            height: 400px; /* Увеличенная высота шапки */
-            position: relative;
-        }
-        .header-content {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-        }
-        header h1 {
-            font-size: 40px; /* Увеличенный размер текста */
-            color: white;
-            margin: 0;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Добавлен легкий тень для лучшей читаемости */
-        }
-        .auth-box {
-            background-color: white;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-            width: 300px;
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-        .auth-box input, .auth-box button {
-            margin-bottom: 10px;
-            padding: 8px;
-            width: calc(100% - 20px);
-            font-size: 14px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .auth-box button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        .auth-box button:hover {
-            background-color: #2980b9;
-        }
-        .container {
-            max-width: 1000px; /* Уменьшена ширина формы */
-            margin: 30px auto;
-            padding: 20px;
-            background: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .form-title {
-            font-size: 24px; /* Увеличен размер заголовка формы */
-            margin-bottom: 25px;
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .form-group select, .form-group input {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .filters-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* Два столбца */
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .filter-group {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 5px;
-            border: 1px solid #ddd; /* Добавлена рамка */
-            box-sizing: border-box; /* Убедимся, что padding и border учитываются в ширине */
-        }
-        .filter-group h3 {
-            margin-top: 0;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-        .filter-options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .filter-options label {
-            display: flex;
-            align-items: center;
-            font-weight: normal;
-        }
-        .filter-options input[type="checkbox"], .filter-options input[type="radio"] {
-            margin-right: 10px;
-        }
-        .form-group button {
-            background-color: #3498db;
-            color: white;
-            padding: 12px 25px; /* Увеличен размер кнопки */
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            display: block;
-            margin: 40px auto 0 auto; /* Увеличен верхний отступ */
-            font-size: 16px;
-        }
-        .form-group button:hover {
-            background-color: #2980b9;
-        }
-
-        /* Дополнительные стили для улучшения отображения фильтров */
-        @media (max-width: 768px) {
-            .filters-section {
-                grid-template-columns: 1fr; /* На мобильных устройствах один столбец */
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/static/cards.css">
+    <link rel="stylesheet" href="/static/styles.css">
     <script>
         // Модели автомобилей, привязанные к марке
         const carModels = {
@@ -371,17 +241,58 @@
 
                         // TODO: Выведите результаты на странице
                         const resultsContainer = document.getElementById("results");
+
                         resultsContainer.innerHTML = ""; // Очищаем предыдущие результаты
+
                         if (results.length === 0) {
                             resultsContainer.innerHTML = "<p>Нет подходящих автомобилей</p>";
                         } else {
-                            const list = document.createElement("ul");
                             results.forEach(car => {
-                                const item = document.createElement("li");
-                                item.textContent = `${car.brandname} ${car.modelname} (${car.yearrelease})`;
-                                list.appendChild(item);
+                                // Создаём карточку
+                                const card = document.createElement("div");
+                                card.classList.add("result-card");
+
+                                // Создаём изображение
+                                const img = document.createElement("img");
+                                img.src = `/static/${car.photo}`; // Указываем путь к фото из JSON
+                                img.alt = `${car.brandname} ${car.modelname}`;
+
+                                // Создаём содержимое карточки
+                                const content = document.createElement("div");
+                                content.classList.add("result-card-content");
+
+                                // Название автомобиля
+                                const title = document.createElement("div");
+                                title.classList.add("result-card-title");
+                                title.textContent = `${car.brandname} ${car.modelname}`;
+
+                                // Краткое описание
+                                const description = document.createElement("div");
+                                description.classList.add("result-card-description");
+                                description.textContent = `
+                                    Год выпуска: ${car.yearrelease}
+                                    Тип кузова: ${car.bodytype}
+                                    Цвет: ${car.colorcar}
+                                    Мощность двигателя: ${car.enginepower} л.с.
+                                `;
+
+                                // Кнопка
+                                const button = document.createElement("a");
+                                button.classList.add("result-card-button");
+                                button.href = `/static/${car.video}`; // Указываем путь к видео из JSON
+                                button.target = "_blank"; // Открываем видео в новой вкладке
+                                button.textContent = "Посмотреть видео";
+
+                                // Собираем карточку
+                                content.appendChild(title);
+                                content.appendChild(description);
+                                content.appendChild(button);
+
+                                card.appendChild(img);
+                                card.appendChild(content);
+
+                                resultsContainer.appendChild(card);
                             });
-                            resultsContainer.appendChild(list);
                         }
                     } catch (error) {
                         console.error("Ошибка при отправке запроса:", error);
