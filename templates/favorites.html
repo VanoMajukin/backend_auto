@@ -24,24 +24,22 @@
             <div class="results-container">
                 {% for car in favorites %}
                     <div class="result-card">
-                        <!-- Изображение автомобиля -->
                         <img src="{{ car.photo[0] }}" alt="{{ car.brandname[0] }} {{ car.modelname[0] }}" class="result-card-img">
-
+                    
                         <div class="result-card-content">
                             <div class="result-card-title">
                                 {{ car.brandname[0] }} {{ car.modelname[0] }}
                             </div>
                             <div class="result-card-description">
-                                <p>Год выпуска: {{ car.yearrelease.split('-')[0] }}</p>
+                                <!-- Форматируем год -->
+                                <p>Год выпуска: {{ car.yearrelease.year }}</p>
                                 <p>Тип кузова: {{ car.bodytype[0] }}</p>
                                 <p>Цвет: {{ car.colorcar[0] }}</p>
                                 <p>Мощность двигателя: {{ car.enginepower[0] }} л.с.</p>
                             </div>
-
-                            <!-- Кнопка для просмотра видео -->
+                    
                             <a href="{{ car.videolink[0] }}" target="_blank" class="result-card-button">Посмотреть видео</a>
-
-                            <!-- Кнопка для удаления из избранного -->
+                    
                             <button class="result-card-button remove-from-favorites" data-car-id="{{ car.id }}">Удалить из избранного</button>
                         </div>
                     </div>
