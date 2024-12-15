@@ -327,11 +327,10 @@ def remove_from_favorites():
     return jsonify({"message": "Автомобиль успешно удален из избранного!"}), 200
 
 # Выход из системы
-@app.route("/logout", methods=["GET"])
+@app.route("/logout")
 def logout():
-    # Очистка сессии
-    session.clear()  # Удаляет все данные сессии
-    return redirect(url_for("login_page"))  
+    session.clear()  # Очищаем все данные сессии
+    return redirect(url_for("index"))  # Перенаправляем на главную страницу
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=5454, debug=True)

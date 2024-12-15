@@ -81,31 +81,27 @@
 
         // Обработка выхода (нажали на "Выйти")
         document.getElementById("logout-button").addEventListener("click", async (event) => {
-            event.preventDefault();
+        event.preventDefault();  // Отменяем стандартное поведение кнопки
 
-            try {
-                const response = await fetch("/logout", {
-                    method: "GET",
-                    credentials: "same-origin",  // Чтобы использовать сессионные данные
-                });
+        try {
+            // Отправляем запрос на сервер для выхода
+            const response = await fetch("/logout", {
+                method: "GET",
+                credentials: "same-origin",  // Отправляем сессионные данные
+            });
 
-                if (response.ok) {
-                    alert("Вы успешно вышли из системы!");
-                    window.location.href = "/"; // Перенаправляем на главную страницу
-                } else {
-                    alert("Ошибка при выходе из системы.");
-                }
-            } catch (error) {
-                console.error("Ошибка при выходе:", error);
-                alert("Произошла ошибка при выходе.");
+            if (response.ok) {
+                alert("Вы успешно вышли из системы!");
+                // Перенаправляем на главную страницу
+                window.location.href = "/";  // Перезагружаем страницу и отправляем на главную
+            } else {
+                alert("Ошибка при выходе из системы.");
             }
-        });
-        function showUnauthorizedState() {
-            // Показываем форму входа и скрываем панель для авторизованных пользователей
-            document.getElementById("login-form").style.display = "block";
-            document.getElementById("register-link").style.display = "block";
-            document.getElementById("user-avatar").style.display = "none";
+        } catch (error) {
+            console.error("Ошибка при выходе:", error);
+            alert("Произошла ошибка при выходе.");
         }
+    });
     </script>
 
 </body>

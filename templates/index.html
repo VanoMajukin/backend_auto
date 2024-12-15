@@ -44,17 +44,18 @@
             <h1>AutoVision – найди автомобиль своей мечты!</h1>
         </div>
         <div class="auth-box">
-            <!-- Блок для неавторизованных пользователей -->
+            <!-- Форма входа -->
             <form id="login-form" style="{{ 'display: none;' if authorized else 'display: block;' }}">
                 <input type="text" id="login" placeholder="Логин" required>
                 <input type="password" id="password" placeholder="Пароль" required>
                 <button type="submit" id="login-button">Войти</button>
             </form>
+        
             <div class="register-link" id="register-link" style="{{ 'display: none;' if authorized else 'display: block;' }}">
                 <span>Нет аккаунта? <a href="/registration">Зарегистрироваться</a></span>
             </div>
         
-            <!-- Блок для авторизованных пользователей -->
+            <!-- Панель для авторизованных пользователей -->
             <div id="user-avatar" style="{{ 'display: block;' if authorized else 'display: none;' }}">
                 <div id="user-info">
                     <div id="user-circle" class="avatar-circle"></div> <!-- Кружок -->
@@ -62,9 +63,9 @@
                 </div>
                 <button id="favorites-button" onclick="goToFavorites()">Избранное</button>
                 <button id="logout-button">Выйти</button>
-            </div>                   
-        </div>                  
+            </div>
         </div>
+    </div>
     </header>
     <div class="container">
         <form id="car-search-form">
@@ -465,6 +466,28 @@
             return color;
         }
     });
+    </script>
+    <script>
+        document.getElementById("logout-button").addEventListener("click", async () => {
+            try {
+                // Отправляем запрос на сервер для выхода
+                const response = await fetch("/logout", {
+                    method: "GET",
+                    credentials: "same-origin",  // Отправляем сессионные данные
+                });
+
+                if (response.ok) {
+                    alert("Вы успешно вышли из системы!");
+                    // Перезагружаем страницу, чтобы обновить состояние
+                    window.location.reload();  // Перезагружаем страницу
+                } else {
+                    alert("Ошибка при выходе из системы.");
+                }
+            } catch (error) {
+                console.error("Ошибка при выходе:", error);
+                alert("Произошла ошибка при выходе.");
+            }
+        });
     </script>
     <script>
         function goToFavorites() {
