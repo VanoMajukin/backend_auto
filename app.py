@@ -65,23 +65,31 @@ def login():
 def favicon():
     return send_from_directory('static', 'favicon.png', mimetype='image/png')
 
-def execute_query(query, params):
+def execute_query(query, params=None):
     """Выполнение SQL-запроса с параметрами."""
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cursor.execute(query, params)
-        results = cursor.fetchall()
-        print(results)
+
+        # Проверяем, является ли запросом типа SELECT
+        if query.strip().lower().startswith("select"):
+            results = cursor.fetchall()  # Для SELECT получаем результаты
+        else:
+            conn.commit()  # Для остальных запросов фиксируем изменения
+            results = None  # Нет результатов для возврата
+
+        print("Запрос выполнен успешно:", query)
         return results
     except Exception as e:
         print(f"Ошибка: {e}")
-        return []
+        return None
     finally:
         if cursor:
             cursor.close()
         if conn:
             conn.close()
+
 
 # Регистрация
 @app.route("/registration", methods=["GET", "POST"])
