@@ -10,11 +10,28 @@
 <body>
     <header>
         <h1>AutoVision – Избранные машины</h1>
-        <nav>
-            <p>Пользователь: {{ username }}</p>
-            <!-- Кнопка выхода -->
-            <a href="/logout" id="logout-button">Выйти</a>
-        </nav>
+        <div class="auth-box">
+            <!-- Форма входа -->
+            <form id="login-form" style="{{ 'display: none;' if authorized else 'display: block;' }}">
+                <input type="text" id="login" placeholder="Логин" required>
+                <input type="password" id="password" placeholder="Пароль" required>
+                <button type="submit" id="login-button">Войти</button>
+            </form>
+        
+            <div class="register-link" id="register-link" style="{{ 'display: none;' if authorized else 'display: block;' }}">
+                <span>Нет аккаунта? <a href="/registration">Зарегистрироваться</a></span>
+            </div>
+        
+            <!-- Панель для авторизованных пользователей -->
+            <div id="user-avatar" style="{{ 'display: block;' if authorized else 'display: none;' }}">
+                <div id="user-info">
+                    <div id="user-circle" class="avatar-circle"></div> <!-- Кружок -->
+                    <span id="user-login">{{ username }}</span> <!-- Имя пользователя -->
+                </div>
+                <button id="favorites-button" onclick="goToFavorites()">Избранное</button>
+                <button id="logout-button">Выйти</button>
+            </div>
+        </div>
     </header>
 
     <div class="container">
@@ -51,6 +68,7 @@
     </div>
 
     <script>
+        
         // Обработчик для удаления автомобиля из избранного
         document.querySelectorAll('.remove-from-favorites').forEach(button => {
             button.addEventListener('click', async function() {
@@ -79,53 +97,125 @@
             });
         });
 
-        // Обработка выхода (нажали на "Выйти")
-        document.getElementById("logout-button").addEventListener("click", async (event) => {
-        event.preventDefault();  // Отменяем стандартное поведение кнопки
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const loginForm = document.getElementById("login-form");
+            const loginButton = document.getElementById("login-button");
+            const registerLink = document.getElementById("register-link");
+            const userAvatar = document.getElementById("user-avatar");
+            const userLoginSpan = document.getElementById("user-login");
+            const userCircle = document.getElementById("user-circle");
+            const logoutButton = document.getElementById("logout-button");
 
-        try {
-            // Отправляем запрос на сервер для выхода
-            const response = await fetch("/logout", {
-                method: "GET",
-                credentials: "same-origin",  // Отправляем сессионные данные
+            // Проверка состояния авторизации
+            const authToken = localStorage.getItem("authToken");
+            const userLogin = localStorage.getItem("userLogin");
+
+            if (authToken && userLogin) {
+                showAuthorizedState(userLogin);
+            } else {
+                showUnauthorizedState();
+            }
+
+            // Обработка входа
+            loginForm.addEventListener("submit", async (event) => {
+                event.preventDefault();
+
+                const login = document.getElementById("login").value;
+                const password = document.getElementById("password").value;
+
+                const data = { login, password };
+
+                try {
+                    const response = await fetch("/login", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data),
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        // Сохраняем токен авторизации и логин
+                        localStorage.setItem("authToken", result.token);
+                        localStorage.setItem("userLogin", login);
+                        alert("Вы успешно вошли!");
+                        showAuthorizedState(login);
+                        window.location.reload();
+                    } else {
+                        alert(result.error || "Ошибка входа!");
+                    }
+                } catch (error) {
+                    console.error("Ошибка авторизации:", error);
+                }
             });
 
-            if (response.ok) {
-                alert("Вы успешно вышли из системы!");
-                // После выхода обновляем интерфейс
-                showUnauthorizedState();
-                window.location.href = "/";  // Перенаправляем на главную страницу
-            } else {
-                alert("Ошибка при выходе из системы.");
+            logoutButton.addEventListener("click", async () => {
+            // Удаляем данные из локального хранилища
+            localStorage.removeItem("auth_token");
+            localStorage.removeItem("userLogin");
+
+            // Отправляем запрос на сервер для выхода (очистка сессии)
+            try {
+                const response = await fetch("/logout", {
+                    method: "GET",  // GET-запрос для выхода
+                    credentials: "same-origin",  // Отправляем сессионные данные
+                });
+
+                if (response.ok) {
+                    alert("Вы вышли из системы!");
+                    // Обновляем интерфейс
+                    showUnauthorizedState();
+                    document.cookie = "session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                    // Обновляем страницу
+                    window.location.reload();  // Перезагружаем страницу
+                } else {
+                    alert("Ошибка при выходе!");
+                }
+            } catch (error) {
+                console.error("Ошибка при выходе:", error);
+                alert("Произошла ошибка при выходе из системы.");
             }
-        } catch (error) {
-            console.error("Ошибка при выходе:", error);
-            alert("Произошла ошибка при выходе.");
-        }
-    });
+        });
 
-    // Функция для отображения состояния "не авторизован"
-    function showUnauthorizedState() {
-        // Показываем форму входа и скрываем панель для авторизованных пользователей
-        document.getElementById("login-form").style.display = "block";
-        document.getElementById("register-link").style.display = "block";
-        document.getElementById("user-avatar").style.display = "none";  // скрыть панель с информацией о пользователе
-        document.getElementById("favorites-button").style.display = "none";  // скрыть кнопку "Избранное"
-        document.getElementById("logout-button").style.display = "none";  // скрыть кнопку "Выйти"
-    }
+            // Функции для управления интерфейсом
+            function showAuthorizedState(login) {
+                loginForm.style.display = "none";
+                registerLink.style.display = "none";
+                userAvatar.style.display = "flex";
 
-    // Функция для отображения состояния "авторизован"
-    function showAuthorizedState(username) {
-        // Показываем панель с информацией о пользователе
-        document.getElementById("user-avatar").style.display = "block";
-        document.getElementById("user-login").textContent = username;  // Показываем имя пользователя
-        document.getElementById("favorites-button").style.display = "inline-block";  // Показываем кнопку "Избранное"
-        document.getElementById("logout-button").style.display = "inline-block";  // Показываем кнопку "Выйти"
-        // Скрываем форму входа
-        document.getElementById("login-form").style.display = "none";
-        document.getElementById("register-link").style.display = "none";
-    }
+                // Устанавливаем логин и генерируем кружок
+                userLoginSpan.textContent = login;
+                setAvatarCircle(login);
+            }
+
+            function showUnauthorizedState() {
+                loginForm.style.display = "block";
+                registerLink.style.display = "block";
+                userAvatar.style.display = "none";
+            }
+
+            // Устанавливаем аватар с первой буквой логина и случайным цветом
+            function setAvatarCircle(login) {
+                const firstLetter = login.charAt(0).toUpperCase();
+                const randomColor = generateRandomColor();
+
+                userCircle.textContent = firstLetter;
+                userCircle.style.backgroundColor = randomColor;
+            }
+
+            // Генерация случайного цвета
+            function generateRandomColor() {
+                const letters = "0123456789ABCDEF";
+                let color = "#";
+                for (let i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+        });
     </script>
-
 </body>
 </html>
