@@ -18,9 +18,6 @@
                 <button type="submit" id="login-button">Войти</button>
             </form>
         
-            <div class="register-link" id="register-link" style="{{ 'display: none;' if authorized else 'display: block;' }}">
-                <span>Нет аккаунта? <a href="/registration">Зарегистрироваться</a></span>
-            </div>
         
             <!-- Панель для авторизованных пользователей -->
             <div id="user-avatar" style="{{ 'display: block;' if authorized else 'display: none;' }}">
