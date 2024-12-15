@@ -400,13 +400,33 @@
             }
         });
 
-        // Обработка выхода
-        logoutButton.addEventListener("click", () => {
-            localStorage.removeItem("authToken");
-            localStorage.removeItem("userLogin");
-            alert("Вы вышли из системы!");
-            showUnauthorizedState();
-        });
+        logoutButton.addEventListener("click", async () => {
+        // Удаляем данные из локального хранилища
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("userLogin");
+
+        // Отправляем запрос на сервер для выхода (очистка сессии)
+        try {
+            const response = await fetch("/logout", {
+                method: "GET",  // GET-запрос для выхода
+                credentials: "same-origin",  // Отправляем сессионные данные
+            });
+
+            if (response.ok) {
+                alert("Вы вышли из системы!");
+                // Обновляем интерфейс
+                showUnauthorizedState();
+
+                // Обновляем страницу
+                window.location.reload();  // Перезагружаем страницу
+            } else {
+                alert("Ошибка при выходе!");
+            }
+        } catch (error) {
+            console.error("Ошибка при выходе:", error);
+            alert("Произошла ошибка при выходе из системы.");
+        }
+    });
 
         // Функции для управления интерфейсом
         function showAuthorizedState(login) {
